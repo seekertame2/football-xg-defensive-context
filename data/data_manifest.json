@@ -1,0 +1,175 @@
+{
+  "source_url": "https://github.com/hudl/open-data",
+  "source_permalink": "https://github.com/hudl/open-data/tree/b0bc9f22dd77c206ddedc1d742893b3bbe64baec",
+  "commit_sha": "b0bc9f22dd77c206ddedc1d742893b3bbe64baec",
+  "downloaded_at": "2026-08-23T15:11:27+00:00",
+  "dataset_config_version": "0.1.0",
+  "stage": "dataset_built",
+  "n_competition_seasons": 80,
+  "n_matches_in_metadata": 3961,
+  "n_match_event_files_in_source": 4235,
+  "n_match_360_files_in_source": 426,
+  "n_files_cached_locally": 161,
+  "selection": {
+    "approved": true,
+    "competition_seasons": [
+      {
+        "competition_id": 11,
+        "season_id": 27
+      },
+      {
+        "competition_id": 2,
+        "season_id": 27
+      },
+      {
+        "competition_id": 12,
+        "season_id": 27
+      },
+      {
+        "competition_id": 7,
+        "season_id": 27
+      }
+    ],
+    "include_three_sixty": false
+  },
+  "note": "Числа ударов, доля защитного контекста и хеши датасета добавляются на этапе 2 скриптом scripts/build_dataset.py.",
+  "audit": {
+    "generated_at": "2026-08-23T15:32:07+00:00",
+    "matches_per_season": 3,
+    "n_matches_audited": 181,
+    "audit_download_mb": 553.6,
+    "n_shots_parsed": 4996,
+    "n_shots_eligible": 4905,
+    "n_shots_penalty_excluded": 91,
+    "share_with_context": 1.0,
+    "share_with_goalkeeper": 0.9985728848114169,
+    "goal_rate": 0.11049949031600408,
+    "criteria": {
+      "min_context_share": 0.95,
+      "min_gk_share": 0.9,
+      "min_estimated_shots": 1500,
+      "min_matches": 50,
+      "max_download_gb": 5.0,
+      "target_shots": 15000
+    },
+    "recommended_selection": [
+      {
+        "competition_id": 11,
+        "season_id": 27,
+        "competition_name": "La Liga",
+        "season_name": "2015/2016",
+        "n_matches_with_events": 380,
+        "estimated_total_shots": 9373
+      },
+      {
+        "competition_id": 2,
+        "season_id": 27,
+        "competition_name": "Premier League",
+        "season_name": "2015/2016",
+        "n_matches_with_events": 380,
+        "estimated_total_shots": 9120
+      },
+      {
+        "competition_id": 12,
+        "season_id": 27,
+        "competition_name": "Serie A",
+        "season_name": "2015/2016",
+        "n_matches_with_events": 380,
+        "estimated_total_shots": 8993
+      },
+      {
+        "competition_id": 7,
+        "season_id": 27,
+        "competition_name": "Ligue 1",
+        "season_name": "2015/2016",
+        "n_matches_with_events": 377,
+        "estimated_total_shots": 8168
+      }
+    ],
+    "recommended_download": {
+      "n_matches": 1517,
+      "n_files": 1517,
+      "total_bytes": 4568675058,
+      "total_mb": 4568.7,
+      "total_gb": 4.569
+    }
+  },
+  "dataset": {
+    "built_at": "2026-08-23T16:04:46+00:00",
+    "n_matches": 1517,
+    "match_ids_sha256": "6a80b43dcf8144fc93bc40da898f0a7ca3e45da6569f630e35d0d6779787c567",
+    "n_events_total": 5321459,
+    "n_shot_events": 37888,
+    "n_all_eligible_shots": 37488,
+    "n_context_eligible_shots": 37487,
+    "share_context_of_all": 0.9999733247972684,
+    "share_with_freeze_frame": 1.0,
+    "share_with_goalkeeper": 0.9991463935125907,
+    "share_with_statsbomb_xg": 1.0,
+    "goal_rate": 0.09520379854886897,
+    "filter_log": [
+      {
+        "step": "all_shots",
+        "description": "Все события типа Shot",
+        "n_before": 37888,
+        "n_after": 37888,
+        "n_dropped": 0,
+        "share_dropped": 0.0
+      },
+      {
+        "step": "drop_penalties",
+        "description": "Пенальти и удары серии пенальти (спецификация, раздел 8.3)",
+        "n_before": 37888,
+        "n_after": 37488,
+        "n_dropped": 400,
+        "share_dropped": 0.010557
+      },
+      {
+        "step": "drop_unknown_outcome",
+        "description": "Исход удара вне известной схемы StatsBomb",
+        "n_before": 37488,
+        "n_after": 37488,
+        "n_dropped": 0,
+        "share_dropped": 0.0
+      },
+      {
+        "step": "drop_missing_location",
+        "description": "Нет координат удара",
+        "n_before": 37488,
+        "n_after": 37488,
+        "n_dropped": 0,
+        "share_dropped": 0.0
+      },
+      {
+        "step": "drop_missing_shot_id",
+        "description": "Нет идентификатора события",
+        "n_before": 37488,
+        "n_after": 37488,
+        "n_dropped": 0,
+        "share_dropped": 0.0
+      },
+      {
+        "step": "drop_duplicate_shot_id",
+        "description": "Дубликаты shot_id",
+        "n_before": 37488,
+        "n_after": 37488,
+        "n_dropped": 0,
+        "share_dropped": 0.0
+      },
+      {
+        "step": "context_eligible",
+        "description": "Есть freeze_frame и хотя бы один соперник с координатами",
+        "n_before": 37488,
+        "n_after": 37487,
+        "n_dropped": 1,
+        "share_dropped": 2.7e-05
+      }
+    ],
+    "files": {
+      "all_eligible_shots": "data\\processed\\all_eligible_shots.parquet",
+      "context_eligible_shots": "data\\processed\\context_eligible_shots.parquet",
+      "all_eligible_sha256": "1c58c1665ad9b9a8856783ed5b27cc0dfda967489f63fca2952aeda70cdba23e",
+      "context_eligible_sha256": "1bc27e8f21ef6d048536e646a597df45457cdc924f9914c9ca446d484f1d29d6"
+    }
+  }
+}

@@ -1,0 +1,59 @@
+# Конфигурация эксперимента (этапы 3–5).
+#
+# Файл создан на этапе 0 как контракт. Значения могут уточняться,
+# но правила спецификации (разделы 10 и 12) менять нельзя:
+# группировка по match_id, фиксированный test, log loss и калибровка как
+# главные метрики, ablation на одних и тех же строках.
+
+random_seed: 42
+
+split:
+  # Разбиение только по группам матчей. Наивное случайное разбиение строк запрещено.
+  group_column: match_id
+  stratify_column: is_goal
+  train_size: 0.70
+  validation_size: 0.15
+  test_size: 0.15
+  # Тестовые shot_id фиксируются один раз и сохраняются на диск.
+  frozen_test_ids_path: data/processed/test_shot_ids.json
+
+cross_validation:
+  strategy: StratifiedGroupKFold
+  n_splits: 5
+  shuffle: true
+
+metrics:
+  primary: log_loss
+  secondary:
+    - brier_score
+    - roc_auc
+    - average_precision
+  calibration_bins: 10
+
+uncertainty:
+  # Bootstrap на уровне матчей, а не отдельных ударов (спецификация, раздел 12).
+  bootstrap_unit: match_id
+  n_bootstrap: 1000
+  confidence_level: 0.95
+
+models:
+  # Небольшой обоснованный search space вместо огромного перебора.
+  logistic_regression:
+    C: [0.01, 0.1, 1.0, 10.0]
+  decision_tree:
+    max_depth: [3, 5, 8, 12]
+    min_samples_leaf: [20, 50, 200]
+  random_forest:
+    n_estimators: [300]
+    max_depth: [8, 14, null]
+    min_samples_leaf: [5, 20, 50]
+  gradient_boosting:
+    learning_rate: [0.03, 0.1]
+    max_iter: [200, 400]
+    max_leaf_nodes: [15, 31]
+
+# Дисбаланс классов: без SMOTE и oversampling в основном пайплайне
+# (спецификация, раздел 10.3).
+class_imbalance:
+  use_resampling: false
+  use_class_weight: false

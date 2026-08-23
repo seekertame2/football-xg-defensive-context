@@ -1,0 +1,480 @@
+{
+  "seed": 42,
+  "n_shots": 37487,
+  "n_matches": 1517,
+  "split_summary": [
+    {
+      "split": "train",
+      "n_matches": 1067,
+      "n_shots": 26206,
+      "share_of_shots": 0.699069010590338,
+      "n_goals": 2499,
+      "goal_rate": 0.09535984125772724,
+      "share_Serie A": 0.2634511180645654,
+      "share_Premier League": 0.2617721132565061,
+      "share_La Liga": 0.2422346027627261,
+      "share_Ligue 1": 0.2325421659162024
+    },
+    {
+      "split": "validation",
+      "n_matches": 226,
+      "n_shots": 5642,
+      "share_of_shots": 0.15050550857630646,
+      "n_goals": 534,
+      "goal_rate": 0.09464728819567529,
+      "share_Serie A": 0.2635590216235377,
+      "share_Premier League": 0.26214108472172987,
+      "share_La Liga": 0.24122651542006382,
+      "share_Ligue 1": 0.23307337823466856
+    },
+    {
+      "split": "test",
+      "n_matches": 224,
+      "n_shots": 5639,
+      "share_of_shots": 0.15042548083335555,
+      "n_goals": 535,
+      "goal_rate": 0.0948749778329491,
+      "share_Serie A": 0.2635219010462848,
+      "share_Premier League": 0.26210320978896967,
+      "share_La Liga": 0.24135485015073593,
+      "share_Ligue 1": 0.23302003901400958
+    }
+  ],
+  "best_nonlinear_model": "random_forest",
+  "best_model_key": "random_forest@geometry_shot_flags_defensive",
+  "n_bootstrap": 1000,
+  "models": [
+    {
+      "key": "dummy@geometry",
+      "model": "DummyClassifier",
+      "feature_set": "geometry",
+      "best_params": {},
+      "cv_log_loss": NaN,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.3131630424449886,
+        "brier": 0.08568968676474632,
+        "mean_predicted": 0.09535984125772724,
+        "roc_auc": 0.5,
+        "pr_auc": 0.09464728819567529
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.3136753167403707,
+        "brier": 0.08587395150668721,
+        "mean_predicted": 0.09535984125772723,
+        "roc_auc": 0.5,
+        "pr_auc": 0.0948749778329491
+      }
+    },
+    {
+      "key": "logistic@geometry",
+      "model": "Логистическая регрессия",
+      "feature_set": "geometry",
+      "best_params": {
+        "C": 0.1
+      },
+      "cv_log_loss": 0.2791392593667499,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.273205316918732,
+        "brier": 0.07692941613921835,
+        "mean_predicted": 0.09495758770669455,
+        "roc_auc": 0.7537680483577205,
+        "pr_auc": 0.2994583338012407
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.2728239597043918,
+        "brier": 0.07699893890944072,
+        "mean_predicted": 0.09522552614705576,
+        "roc_auc": 0.7597041352942899,
+        "pr_auc": 0.29824266792114684
+      }
+    },
+    {
+      "key": "logistic@geometry_shot",
+      "model": "Логистическая регрессия",
+      "feature_set": "geometry_shot",
+      "best_params": {
+        "C": 10.0
+      },
+      "cv_log_loss": 0.26378680680134725,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.25774810128521125,
+        "brier": 0.07288596130049277,
+        "mean_predicted": 0.0939588721337863,
+        "roc_auc": 0.7923998926557152,
+        "pr_auc": 0.3606779414703928
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.25629566633154466,
+        "brier": 0.07267948986502556,
+        "mean_predicted": 0.09311780334651575,
+        "roc_auc": 0.800679511030381,
+        "pr_auc": 0.3680628886036855
+      }
+    },
+    {
+      "key": "logistic@geometry_shot_flags",
+      "model": "Логистическая регрессия",
+      "feature_set": "geometry_shot_flags",
+      "best_params": {
+        "C": 10.0
+      },
+      "cv_log_loss": 0.26121867208240485,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.2551519152146227,
+        "brier": 0.07188484798530889,
+        "mean_predicted": 0.09392351264302287,
+        "roc_auc": 0.7950268580679789,
+        "pr_auc": 0.37988978332412476
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.2545637233032979,
+        "brier": 0.07209474124396344,
+        "mean_predicted": 0.09226976615244827,
+        "roc_auc": 0.8021928925087158,
+        "pr_auc": 0.3796945171152446
+      }
+    },
+    {
+      "key": "decision_tree@geometry_shot_flags",
+      "model": "Дерево решений",
+      "feature_set": "geometry_shot_flags",
+      "best_params": {
+        "max_depth": 5,
+        "min_samples_leaf": 50
+      },
+      "cv_log_loss": 0.2684992999167875,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.2657126175176031,
+        "brier": 0.0743851695688674,
+        "mean_predicted": 0.09314850355144579,
+        "roc_auc": 0.7609578790998331,
+        "pr_auc": 0.3069280682868844
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.25996479843053905,
+        "brier": 0.07368406243218148,
+        "mean_predicted": 0.09291817480924489,
+        "roc_auc": 0.7850687018427913,
+        "pr_auc": 0.3170658970533535
+      }
+    },
+    {
+      "key": "random_forest@geometry_shot_flags",
+      "model": "Случайный лес",
+      "feature_set": "geometry_shot_flags",
+      "best_params": {
+        "max_depth": 14,
+        "min_samples_leaf": 5,
+        "n_estimators": 300
+      },
+      "cv_log_loss": 0.26237195778412237,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.2567616901961699,
+        "brier": 0.07208672314452372,
+        "mean_predicted": 0.09352322137407683,
+        "roc_auc": 0.7918037799266188,
+        "pr_auc": 0.380105529154143
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.2539983128193986,
+        "brier": 0.0722277131683198,
+        "mean_predicted": 0.0921267781113897,
+        "roc_auc": 0.8049391351478042,
+        "pr_auc": 0.37516916197214767
+      }
+    },
+    {
+      "key": "gradient_boosting@geometry_shot_flags",
+      "model": "Градиентный бустинг",
+      "feature_set": "geometry_shot_flags",
+      "best_params": {
+        "learning_rate": 0.03,
+        "max_iter": 200,
+        "max_leaf_nodes": 15
+      },
+      "cv_log_loss": 0.26035493117331254,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.2569351181750608,
+        "brier": 0.07206350455527154,
+        "mean_predicted": 0.09348988615244652,
+        "roc_auc": 0.7890444672233319,
+        "pr_auc": 0.3784969135901983
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.25233550511437614,
+        "brier": 0.07171725166893814,
+        "mean_predicted": 0.09265974232678732,
+        "roc_auc": 0.8082682081856268,
+        "pr_auc": 0.38162904802213726
+      }
+    },
+    {
+      "key": "logistic@geometry_shot_flags_defensive",
+      "model": "Логистическая регрессия",
+      "feature_set": "geometry_shot_flags_defensive",
+      "best_params": {
+        "C": 1.0
+      },
+      "cv_log_loss": 0.25251947151655363,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.25033238117648154,
+        "brier": 0.07066910202780091,
+        "mean_predicted": 0.0934823671393338,
+        "roc_auc": 0.8055733973879559,
+        "pr_auc": 0.39858266609741594
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.24271395921663452,
+        "brier": 0.06922020383276707,
+        "mean_predicted": 0.0921748842858035,
+        "roc_auc": 0.8300398441391029,
+        "pr_auc": 0.42474741792810394
+      }
+    },
+    {
+      "key": "random_forest@geometry",
+      "model": "Случайный лес",
+      "feature_set": "geometry",
+      "best_params": {
+        "max_depth": 8,
+        "min_samples_leaf": 50,
+        "n_estimators": 300
+      },
+      "cv_log_loss": 0.27766132543430516,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.2751170227114307,
+        "brier": 0.07728192778193407,
+        "mean_predicted": 0.09442898367848997,
+        "roc_auc": 0.7449913332688094,
+        "pr_auc": 0.2894410370368513
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.27205596986455405,
+        "brier": 0.07735568228750735,
+        "mean_predicted": 0.09454271453476362,
+        "roc_auc": 0.75977280051563,
+        "pr_auc": 0.2832653407609096
+      }
+    },
+    {
+      "key": "random_forest@geometry_shot",
+      "model": "Случайный лес",
+      "feature_set": "geometry_shot",
+      "best_params": {
+        "max_depth": 14,
+        "min_samples_leaf": 20,
+        "n_estimators": 300
+      },
+      "cv_log_loss": 0.26594023110764015,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.262028443983022,
+        "brier": 0.07392783189585311,
+        "mean_predicted": 0.09374108721113936,
+        "roc_auc": 0.7850003592807346,
+        "pr_auc": 0.3494512594190892
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.2578257491998222,
+        "brier": 0.07355591915389043,
+        "mean_predicted": 0.0930989579905415,
+        "roc_auc": 0.8017354905809627,
+        "pr_auc": 0.3573234327870111
+      }
+    },
+    {
+      "key": "random_forest@geometry_shot_flags_defensive",
+      "model": "Случайный лес",
+      "feature_set": "geometry_shot_flags_defensive",
+      "best_params": {
+        "max_depth": 14,
+        "min_samples_leaf": 5,
+        "n_estimators": 300
+      },
+      "cv_log_loss": 0.25332818995476825,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.2519688757630468,
+        "brier": 0.07067539319850374,
+        "mean_predicted": 0.09403949636378939,
+        "roc_auc": 0.8007355723122135,
+        "pr_auc": 0.3966056306137219
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.24325303136751456,
+        "brier": 0.06944603252858372,
+        "mean_predicted": 0.09358896240582375,
+        "roc_auc": 0.8296384730319631,
+        "pr_auc": 0.42195194309275985
+      }
+    },
+    {
+      "key": "statsbomb_xg",
+      "model": "statsbomb_xg (benchmark)",
+      "feature_set": "—",
+      "best_params": {},
+      "cv_log_loss": NaN,
+      "validation": {
+        "n": 5642,
+        "n_goals": 534,
+        "goal_rate": 0.09464728819567529,
+        "log_loss": 0.24995889147007785,
+        "brier": 0.07030318271821925,
+        "mean_predicted": 0.09050546354244948,
+        "roc_auc": 0.8069811912869289,
+        "pr_auc": 0.40072455954895886
+      },
+      "test": {
+        "n": 5639,
+        "n_goals": 535,
+        "goal_rate": 0.0948749778329491,
+        "log_loss": 0.24042173025216818,
+        "brier": 0.06824255697360693,
+        "mean_predicted": 0.08952349035788261,
+        "roc_auc": 0.8345790730378226,
+        "pr_auc": 0.4421878806376978
+      }
+    }
+  ],
+  "bootstrap": [
+    {
+      "n_matches": 224,
+      "n_shots": 5639,
+      "n_bootstrap": 1000,
+      "confidence_level": 0.95,
+      "delta_log_loss": -0.01652829337284717,
+      "delta_log_loss_ci_low": -0.020849012599977786,
+      "delta_log_loss_ci_high": -0.011859909824957429,
+      "delta_log_loss_significant": true,
+      "delta_brier": -0.004319449044415155,
+      "delta_brier_ci_low": -0.005568344269461482,
+      "delta_brier_ci_high": -0.002952306263943411,
+      "delta_brier_significant": true,
+      "сравнение": "Логистическая: + характеристики удара (L1 → L2)"
+    },
+    {
+      "n_matches": 224,
+      "n_shots": 5639,
+      "n_bootstrap": 1000,
+      "confidence_level": 0.95,
+      "delta_log_loss": -0.0017319430282467518,
+      "delta_log_loss_ci_low": -0.003502482057169516,
+      "delta_log_loss_ci_high": 0.00020775600749259283,
+      "delta_log_loss_significant": false,
+      "delta_brier": -0.0005847486210621283,
+      "delta_brier_ci_low": -0.0011843114850615013,
+      "delta_brier_ci_high": 2.8766320069269495e-05,
+      "delta_brier_significant": false,
+      "сравнение": "Логистическая: + флаги StatsBomb (L2 → L3)"
+    },
+    {
+      "n_matches": 224,
+      "n_shots": 5639,
+      "n_bootstrap": 1000,
+      "confidence_level": 0.95,
+      "delta_log_loss": -0.011849764086663384,
+      "delta_log_loss_ci_low": -0.016034306191738457,
+      "delta_log_loss_ci_high": -0.007841630897871136,
+      "delta_log_loss_significant": true,
+      "delta_brier": -0.002874537411196365,
+      "delta_brier_ci_low": -0.004097241574421155,
+      "delta_brier_ci_high": -0.0016581340657779995,
+      "delta_brier_significant": true,
+      "сравнение": "Логистическая: + защитный контекст (L3 → L4)"
+    },
+    {
+      "n_matches": 224,
+      "n_shots": 5639,
+      "n_bootstrap": 1000,
+      "confidence_level": 0.95,
+      "delta_log_loss": -0.010745281451884053,
+      "delta_log_loss_ci_low": -0.015324459372358797,
+      "delta_log_loss_ci_high": -0.006286434485499221,
+      "delta_log_loss_significant": true,
+      "delta_brier": -0.0027816806397360783,
+      "delta_brier_ci_low": -0.0042056726270939745,
+      "delta_brier_ci_high": -0.0015990113140984803,
+      "delta_brier_significant": true,
+      "сравнение": "Случайный лес: + защитный контекст (L3 → L4)"
+    },
+    {
+      "n_matches": 224,
+      "n_shots": 5639,
+      "n_bootstrap": 1000,
+      "confidence_level": 0.95,
+      "delta_log_loss": 0.0028313011153463796,
+      "delta_log_loss_ci_low": -0.0009194376515097103,
+      "delta_log_loss_ci_high": 0.006546156233122153,
+      "delta_log_loss_significant": false,
+      "delta_brier": 0.0012034755549767961,
+      "delta_brier_ci_low": 0.00025503131894698603,
+      "delta_brier_ci_high": 0.0021511267857742197,
+      "delta_brier_significant": false,
+      "сравнение": "Лучшая модель против statsbomb_xg"
+    }
+  ]
+}
