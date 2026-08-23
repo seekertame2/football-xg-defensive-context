@@ -52,6 +52,7 @@ from xg_context.data import (
     events_path,
     fetch_source_inventory,
 )
+from xg_context.reporting import markdown_table
 
 logger = logging.getLogger("audit_data")
 
@@ -87,6 +88,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         "--skip-three-sixty",
         action="store_true",
         help="не скачивать пробные файлы StatsBomb 360 (экономит около 15 МБ)",
+    )
+    parser.add_argument(
+        "--selection",
+        action="store_true",
+        help=(
+            "проверить УТВЕРЖДЁННУЮ выборку по полным данным вместо поиска рекомендации. "
+            "Читает reports/tables/full_sample_audit.json, который пишет build_dataset.py"
+        ),
     )
     parser.add_argument(
         "--quick",
@@ -278,6 +287,253 @@ def _md_table(
                 cells.append(str(value))
         lines.append("| " + " | ".join(cells) + " |")
     return "\n".join(lines) + "\n"
+
+
+def render_selection_report(context: dict[str, Any]) -> str:
+    """Отчёт по УТВЕРЖДЁННОЙ выборке, посчитанный на всех её матчах.
+
+    В отличие от режима рекомендации, здесь ничего не оценивается по выборке
+    из трёх матчей на сезон: все доли — перепись по всем ударам выборки.
+    """
+    cfg = context["config"]
+    audit = context["full_audit"]
+    schema = audit["schema"]
+    source_totals = context["source_totals"]
+    by_league = pd.DataFrame(audit["by_league"])
+    filters = pd.DataFrame(audit["filter_log"])
+
+    parts: list[str] = []
+    add = parts.append
+
+    add("# Аудит данных StatsBomb Open Data\n")
+    add(
+        "> Файл сгенерирован скриптом `scripts/audit_data.py --selection`. "
+        "Не редактируйте его вручную — правьте код и перезапускайте аудит.\n"
+    )
+    add(
+        f"- **Источник:** [{cfg.source.repo}]({cfg.source.source_url})\n"
+        f"- **Зафиксированная ревизия:** `{cfg.source.commit_sha}`\n"
+        f"- **Permalink:** {cfg.source.permalink}\n"
+        f"- **Дата аудита:** {context['generated_at']}\n"
+        f"- **Режим:** проверка утверждённой выборки по полным данным\n"
+    )
+
+    add("\n## 1. Утверждённая выборка\n\n")
+    add(
+        "Владелец проекта утвердил состав выборки 2026-08-23 по результатам "
+        "предварительного аудита. Целевая популяция — ведущие европейские мужские "
+        "лиги сезона 2015/2016.\n\n"
+    )
+    add(
+        markdown_table(
+            by_league,
+            {
+                "competition_name": "Лига",
+                "n_matches": "Матчей",
+                "n_shots": "Ударов",
+                "goal_rate": "Доля голов",
+                "share_with_freeze_frame": "freeze_frame",
+                "share_with_goalkeeper": "вратарь",
+                "share_with_statsbomb_xg": "statsbomb_xg",
+                "mean_opponents_visible": "Видно соперников",
+            },
+            {
+                "goal_rate": "{:.4f}",
+                "share_with_freeze_frame": "{:.4f}",
+                "share_with_goalkeeper": "{:.4f}",
+                "share_with_statsbomb_xg": "{:.4f}",
+                "mean_opponents_visible": "{:.2f}",
+            },
+        )
+    )
+    add(
+        f"\nВсего разобрано **{_fmt_int(audit['n_events_total'])} событий** из "
+        f"**{_fmt_int(audit['n_matches'])} матчей**; событий типа Shot — "
+        f"**{_fmt_int(audit['n_shot_events'])}**.\n"
+    )
+    add(
+        f"\nДля контекста: во всей зафиксированной ревизии источника "
+        f"{source_totals['n_event_files']} файлов событий объёмом "
+        f"{source_totals['events_gb']:.1f} ГБ и {source_totals['n_360_files']} файлов "
+        f"StatsBomb 360 объёмом {source_totals['three_sixty_gb']:.1f} ГБ. "
+        "Скачана только утверждённая выборка.\n"
+    )
+
+    add("\n## 2. Фильтры и счётчики строк\n\n")
+    add(
+        markdown_table(
+            filters,
+            {
+                "step": "Шаг",
+                "description": "Что отсеивается",
+                "n_before": "До",
+                "n_after": "После",
+                "n_dropped": "Удалено",
+            },
+        )
+    )
+    add(
+        f"\nИтого: **{_fmt_int(audit['n_all_eligible'])}** непенальтистских ударов "
+        f"в `all_eligible_shots` и **{_fmt_int(audit['n_context_eligible'])}** "
+        f"в `context_eligible_shots`.\n"
+    )
+
+    add("\n## 3. Покрытие защитного контекста по полным данным\n\n")
+    add(
+        f"| Показатель | Значение |\n| --- | ---: |\n"
+        f"| Доля ударов с `shot.freeze_frame` | {_pct(audit['share_with_freeze_frame'])} |\n"
+        f"| Доля с координатами соперников | "
+        f"{_pct(audit['share_with_opponent_coordinates'])} |\n"
+        f"| Доля с распознанным вратарём | {_pct(audit['share_with_goalkeeper'])} |\n"
+        f"| Доля с заполненным `statsbomb_xg` | {_pct(audit['share_with_statsbomb_xg'])} |\n"
+        f"| Кадров с некорректными координатами | "
+        f"{_fmt_int(audit['n_frames_with_invalid_locations'])} |\n"
+        f"| Медиана видимых соперников | "
+        f"{audit['median_opponents_visible']:.0f} |\n"
+        f"| Среднее видимых соперников | {audit['mean_opponents_visible']:.2f} |\n"
+        f"| Базовая доля голов | {_pct(audit['goal_rate_all_eligible'])} |\n"
+    )
+    add(
+        f"\n**Важное ограничение.** В кадре видно в среднем "
+        f"{audit['mean_opponents_visible']:.1f} соперника, а не всех десятерых полевых. "
+        "`shot.freeze_frame` показывает только игроков, попавших в кадр камеры. "
+        "Поэтому все счётчики защитников — это «сколько соперников ВИДНО», а не "
+        "«сколько их на поле». Число видимых сохранено отдельным признаком "
+        "`n_opponents_visible`, чтобы модель могла учитывать неполноту кадра.\n"
+    )
+
+    add("\n## 4. Проверка схемы\n\n")
+    outcomes = pd.DataFrame(
+        sorted(schema["outcome_counts"].items(), key=lambda kv: -kv[1]),
+        columns=["outcome", "n"],
+    )
+    add(markdown_table(outcomes, {"outcome": "Исход удара", "n": "Ударов"}))
+    if schema["unknown_outcomes"]:
+        add(
+            f"\n**Обнаружены неизвестные исходы:** {schema['unknown_outcomes']}. "
+            "Пайплайн остановлен, схему нужно пересмотреть.\n"
+        )
+    else:
+        add(
+            "\nВсе исходы входят в известную схему StatsBomb: неизвестных значений нет, "
+            "молчаливых превращений в «не гол» не произошло.\n"
+        )
+
+    add("\n### Разреженные булевы поля\n\n")
+    add(
+        "StatsBomb записывает такие поля только когда они истинны. Трактовать "
+        "отсутствие поля как `false` можно лишь после проверки, что значение "
+        "`false` в данных не встречается (спецификация, раздел 9.5).\n\n"
+    )
+    booleans = pd.DataFrame(
+        [
+            {
+                "поле": name,
+                "встречено true": counts.get("True", 0),
+                "встречено false": counts.get("False", 0),
+                "только true": "да" if schema["sparse_booleans_confirmed"].get(name) else "НЕТ",
+            }
+            for name, counts in sorted(schema["boolean_values"].items())
+        ]
+    )
+    add(
+        markdown_table(
+            booleans,
+            {
+                "поле": "Поле",
+                "встречено true": "true",
+                "встречено false": "false",
+                "только true": "Отсутствие = false?",
+            },
+        )
+    )
+
+    add("\n## 5. Selection bias: `all_eligible` против `context_eligible`\n\n")
+    n_all = audit["n_all_eligible"]
+    n_context = audit["n_context_eligible"]
+    dropped = n_all - n_context
+    add(
+        f"| Выборка | Ударов | Доля голов |\n| --- | ---: | ---: |\n"
+        f"| `all_eligible_shots` | {_fmt_int(n_all)} | "
+        f"{_pct(audit['goal_rate_all_eligible'])} |\n"
+        f"| `context_eligible_shots` | {_fmt_int(n_context)} | "
+        f"{_pct(audit['goal_rate_context_eligible'])} |\n"
+        f"| Исключено из-за отсутствия контекста | {_fmt_int(dropped)} | — |\n"
+    )
+    add("\n" + _selection_bias_verdict(n_all, n_context) + "\n")
+
+    add("\n## 6. StatsBomb 360\n\n")
+    add(
+        "Отдельные файлы StatsBomb 360 не используются. Причина не в содержании "
+        "кадра, а в покрытии: файлы 360 существуют лишь для 426 матчей источника "
+        f"из {source_totals['n_event_files']}, и **ни один из "
+        f"{_fmt_int(audit['n_matches'])} матчей утверждённой выборки их не имеет**. "
+        "Опора на 360 означала бы смену выборки на несопоставимо меньшую. "
+        "Решение зафиксировано как D-010 в `DECISIONS.md`.\n"
+    )
+
+    add("\n## 7. Ограничения\n\n")
+    for item in _selection_limitations(audit):
+        add(f"- {item}\n")
+
+    add("\n---\n\n")
+    add(
+        "Машиночитаемая сводка: `reports/tables/full_sample_audit.json`. "
+        "Таблицы: `reports/tables/dataset_by_league.csv`, "
+        "`reports/tables/dataset_filters.csv`. "
+        "Предварительный аудит всего источника (80 competition-season) можно "
+        "воспроизвести командой `python scripts/audit_data.py` без флага "
+        "`--selection`.\n"
+    )
+    return "".join(parts)
+
+
+def _pct(value: float) -> str:
+    return "н/д" if pd.isna(value) else f"{value * 100:.3f}%"
+
+
+def _selection_bias_verdict(n_all: int, n_context: int) -> str:
+    """Вывод о смещении выборки — строго по фактическому числу исключённых строк."""
+    dropped = n_all - n_context
+    share = dropped / n_all if n_all else 0.0
+    if dropped == 0:
+        return (
+            "Из выборки не исключён ни один удар: `context_eligible_shots` полностью "
+            "совпадает с `all_eligible_shots`. Смещение отбора между ними невозможно "
+            "по построению, и главное сравнение моделей идёт на всех строках."
+        )
+    if dropped < 10:
+        return (
+            f"Исключено {dropped} удар(а) из {n_all:,} ({share:.5%}). ".replace(",", "\u202f")
+            + "Сравнивать распределения групп статистически бессмысленно: в одной из "
+            "них единицы наблюдений. Практически `context_eligible_shots` совпадает "
+            "с `all_eligible_shots`, поэтому разницу метрик в ablation нельзя "
+            "объяснить отбором строк. Это не проверенное отсутствие смещения, "
+            "а его невозможность при таком объёме потерь."
+        )
+    return (
+        f"Исключено {dropped:,} ударов из {n_all:,} ({share:.3%}). ".replace(",", "\u202f")
+        + "Доля потерь заметна: распределения групп нужно сравнить явно, а различие "
+        "оговорить в разделе ограничений. Главное сравнение моделей обязано идти "
+        "на одних и тех же строках `context_eligible_shots`."
+    )
+
+
+def _selection_limitations(audit: dict[str, Any]) -> list[str]:
+    return [
+        f"`shot.freeze_frame` показывает в среднем {audit['mean_opponents_visible']:.1f} "
+        "соперника вместо десяти полевых: кадр ограничен полем зрения камеры. "
+        "Все защитные признаки описывают видимую часть обороны.",
+        "Выборка — четыре европейские мужские лиги одного сезона. Это не случайная "
+        "выборка мирового футбола, и переносить выводы на другие лиги, эпохи или "
+        "женский футбол нельзя.",
+        "Все четыре лиги относятся к сезону 2015/2016, поэтому временной holdout "
+        "по сезонам невозможен. Устойчивость проверяется разрезом метрик по лигам.",
+        "`statsbomb_xg` рассчитан моделью StatsBomb на закрытых данных, поэтому "
+        "сравнение с ним не является равным по условиям.",
+        "Числа матчей, файлов и объёмов взяты из git-tree зафиксированной ревизии "
+        "и точны; доли покрытия посчитаны по всем ударам выборки, а не по подвыборке.",
+    ]
 
 
 def render_report(context: dict[str, Any]) -> str:
@@ -538,6 +794,32 @@ def render_report(context: dict[str, Any]) -> str:
 # --------------------------------------------------------------------------------------
 
 
+def _run_selection_audit(config) -> int:
+    """Перегенерировать отчёт по утверждённой выборке из полных данных."""
+    audit_path = TABLES_DIR / "full_sample_audit.json"
+    if not audit_path.exists():
+        raise SystemExit(
+            f"Нет файла {audit_path}. Сначала выполните:\n"
+            "  python scripts/build_dataset.py --config configs/data.yaml"
+        )
+    full_audit = json.loads(audit_path.read_text(encoding="utf-8"))
+
+    downloader = build_downloader(config)
+    inventory = fetch_source_inventory(downloader)
+
+    context = {
+        "config": config,
+        "generated_at": datetime.now(UTC).strftime("%Y-%m-%d"),
+        "full_audit": full_audit,
+        "source_totals": _source_totals(inventory),
+    }
+    REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    path = REPORTS_DIR / "data_audit.md"
+    path.write_text(render_selection_report(context), encoding="utf-8")
+    logger.info("Отчёт по утверждённой выборке записан: %s", path)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -560,6 +842,9 @@ def main(argv: list[str] | None = None) -> int:
             "Режим --quick: 1 матч на сезон, без проверки 360. "
             "Вывод пишется с суффиксом _quick и не затирает канонический отчёт."
         )
+
+    if args.selection:
+        return _run_selection_audit(config)
 
     downloader = build_downloader(config)
 
