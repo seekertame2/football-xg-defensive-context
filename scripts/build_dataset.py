@@ -74,7 +74,7 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument(
         "--quick",
         action="store_true",
-        help="лёгкий режим: 20 матчей, результаты пишутся с суффиксом _quick",
+        help="лёгкий режим: 40 матчей (по 10 на лигу), вывод с суффиксом _quick",
     )
     return parser.parse_args(argv)
 
@@ -153,6 +153,24 @@ def build_full_sample_audit(
     }
 
 
+def _spread_across_competitions(matches: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
+    """Взять ограниченное число матчей поровну из каждого соревнования.
+
+    Простое срезание первых N дало бы матчи одной лиги: список отсортирован
+    по competition_id. Тогда smoke-прогон не проверил бы ни балансировку
+    разбиения по лигам, ни разрез метрик по ним.
+    """
+    by_competition: dict[int, list[dict[str, Any]]] = {}
+    for match in matches:
+        by_competition.setdefault(match["competition_id"], []).append(match)
+
+    picked: list[dict[str, Any]] = []
+    per_competition = max(1, limit // max(len(by_competition), 1))
+    for group in by_competition.values():
+        picked.extend(group[:per_competition])
+    return sorted(picked, key=lambda m: (m["competition_id"], m["match_id"]))[:limit]
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -172,14 +190,14 @@ def main(argv: list[str] | None = None) -> int:
     suffix = ""
     limit = args.limit_matches
     if args.quick:
-        limit = 20
+        limit = 40
         suffix = "_quick"
         logger.info("Режим --quick: 20 матчей, вывод с суффиксом _quick.")
 
     downloader = build_downloader(config)
     matches = load_selected_matches(downloader, selection)
     if limit is not None:
-        matches = matches[:limit]
+        matches = _spread_across_competitions(matches, limit)
     logger.info("Матчей в выборке: %d", len(matches))
 
     logger.info("Шаг 1/5: разбор событий")
