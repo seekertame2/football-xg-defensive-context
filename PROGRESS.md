@@ -128,7 +128,7 @@ pytest -q && ruff check . && ruff format --check .
 ## Проверки
 
 ```text
-pytest              197 passed
+pytest              213 passed (включая smoke-тест полного пайплайна)
 ruff check .        All checks passed!
 ruff format --check все файлы отформатированы
 notebooks           5 из 5 исполняются без ошибок
@@ -169,7 +169,7 @@ python scripts/make_report.py
 
 ## Плановый технический долг
 
-- smoke-тест полного пайплайна в CI: сейчас CI гоняет unit-тесты и линтер,
-  но не проверяет `--quick`-режимы скриптов;
-- `--quick`-режим `run_experiments.py` не покрыт тестом;
+- `--quick`-режимы скриптов не покрыты тестами напрямую: связность пайплайна
+  проверяется `tests/test_pipeline_smoke.py` на синтетических событиях,
+  а сами CLI-обёртки — нет;
 - leave-one-league-out и PCA — необязательные расширения (O-006, O-007).
