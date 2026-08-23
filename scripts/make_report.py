@@ -48,7 +48,9 @@ from xg_context.visualization import (
     plot_feature_importance,
     plot_freeze_frame_examples,
     plot_goal_rate_by_geometry,
+    plot_league_skill,
     plot_sample_overview,
+    plot_sensitivity,
     plot_shot_map,
     plot_xg_surface,
     save_figure,
@@ -294,6 +296,16 @@ def main(argv: list[str] | None = None) -> int:
         FIGURES_DIR / "07_xg_surface.png",
     )
 
+    # ------------------------------------------------------------------ sensitivity
+    bootstrap = pd.read_csv(TABLES_DIR / "bootstrap.csv")
+    logger.info("Графики: sensitivity test")
+    save_figure(plot_sensitivity(bootstrap), FIGURES_DIR / "10_sensitivity.png")
+
+    skill_path = TABLES_DIR / "league_skill.csv"
+    if skill_path.exists():
+        logger.info("Графики: относительное качество по лигам")
+        save_figure(plot_league_skill(pd.read_csv(skill_path)), FIGURES_DIR / "11_league_skill.png")
+
     # ------------------------------------------------------------------ ошибки
     logger.info("Анализ ошибок по подгруппам")
     subgroups = build_subgroups(predictions)
@@ -361,11 +373,15 @@ def _write_results_report(
     examples: pd.DataFrame,
 ) -> None:
     """Собрать `reports/results.md` из посчитанных таблиц."""
+    skill_path = TABLES_DIR / "league_skill.csv"
+    sensitivity_path = TABLES_DIR / "sensitivity_visible.csv"
     text = render_results_report(
         summary,
         ablation,
         subgroups,
         examples,
+        league_skill=pd.read_csv(skill_path) if skill_path.exists() else None,
+        sensitivity=pd.read_csv(sensitivity_path) if sensitivity_path.exists() else None,
         league=pd.read_csv(TABLES_DIR / "metrics_by_league.csv"),
         calibration=pd.read_csv(TABLES_DIR / "calibration_summary.csv"),
     )

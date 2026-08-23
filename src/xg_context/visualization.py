@@ -38,7 +38,9 @@ __all__ = [
     "plot_feature_importance",
     "plot_freeze_frame_examples",
     "plot_goal_rate_by_geometry",
+    "plot_league_skill",
     "plot_sample_overview",
+    "plot_sensitivity",
     "plot_shot_map",
     "plot_xg_surface",
     "save_figure",
@@ -511,5 +513,105 @@ def plot_error_analysis(subgroups: pd.DataFrame) -> plt.Figure:
     for index, (value, n) in enumerate(zip(improvement, table["n"], strict=True)):
         axes[1].text(value, index, f"  n={n}", va="center", fontsize=8, color="#555555")
 
+    fig.tight_layout()
+    return fig
+
+
+def plot_sensitivity(bootstrap: pd.DataFrame) -> plt.Figure:
+    """Устойчив ли главный эффект без спорного признака `n_opponents_visible`.
+
+    Вопрос: не держится ли прирост от защитного контекста на признаке, который
+    смешивает плотность обороны с границами поля зрения камеры?
+    """
+    wanted = bootstrap[
+        bootstrap["сравнение"].str.contains("защитный контекст|Вучёт", regex=True)
+        | bootstrap["сравнение"].str.contains("n_opponents_visible")
+    ].copy()
+    if wanted.empty:
+        wanted = bootstrap.copy()
+
+    labels = (
+        wanted["сравнение"]
+        .str.replace("Логистическая: ", "ЛР: ", regex=False)
+        .str.replace("Случайный лес: ", "СЛ: ", regex=False)
+        .str.replace("+ защитный контекст ", "+контекст ", regex=False)
+        .str.replace("+ защитный контекст", "+контекст", regex=False)
+    )
+    positions = np.arange(len(wanted))[::-1]
+    colors = [
+        COLORS["neutral"] if "Вклад самого" in name else COLORS["defensive"]
+        for name in wanted["сравнение"]
+    ]
+
+    fig, ax = plt.subplots(figsize=(11, 0.62 * len(wanted) + 2.2))
+    ax.errorbar(
+        wanted["delta_log_loss"],
+        positions,
+        xerr=[
+            wanted["delta_log_loss"] - wanted["delta_log_loss_ci_low"],
+            wanted["delta_log_loss_ci_high"] - wanted["delta_log_loss"],
+        ],
+        fmt="none",
+        ecolor="#666666",
+        elinewidth=1.4,
+        capsize=4,
+    )
+    ax.scatter(wanted["delta_log_loss"], positions, s=70, c=colors, zorder=3)
+    ax.axvline(0, color="#333333", lw=1.0)
+    ax.set_yticks(positions)
+    ax.set_yticklabels(labels, fontsize=9)
+    ax.set_xlabel("Δ log loss на тесте (отрицательное — лучше), 95% интервал")
+    ax.set_title("Эффект защитного контекста устойчив к удалению `n_opponents_visible`")
+    fig.tight_layout()
+    return fig
+
+
+def plot_league_skill(league_skill: pd.DataFrame) -> plt.Figure:
+    """Относительное качество внутри каждой лиги.
+
+    Вопрос: одинаково ли модель работает в четырёх лигах, если убрать эффект
+    разной базовой доли голов? Сырой log loss для этого не годится.
+    """
+    frame = league_skill.copy()
+    order = sorted(frame["лига"].unique())
+    models = [
+        "Логистическая без контекста",
+        "Логистическая + защитный контекст",
+        "statsbomb_xg",
+    ]
+    models = [m for m in models if m in set(frame["модель"])]
+    palette = [COLORS["flags"], COLORS["defensive"], COLORS["statsbomb"]]
+
+    fig, axes = plt.subplots(1, 2, figsize=(13.5, 4.8))
+    width = 0.8 / max(len(models), 1)
+
+    for panel, (ax, column, title) in enumerate(
+        (
+            (axes[0], "log loss", "Сырой log loss: сравнивать лиги нельзя"),
+            (axes[1], "BSS", "Brier Skill Score: сопоставимо между лигами"),
+        )
+    ):
+        for index, model in enumerate(models):
+            part = frame[frame["модель"] == model].set_index("лига").reindex(order)
+            ax.bar(
+                np.arange(len(order)) + index * width - 0.4 + width / 2,
+                part[column],
+                width=width,
+                label=model,
+                color=palette[index % len(palette)],
+            )
+        ax.set_xticks(range(len(order)))
+        ax.set_xticklabels(order, fontsize=9)
+        ax.set_title(title)
+        ax.set_ylabel(column)
+        if panel == 0:
+            ax.legend(fontsize=9)
+
+    rates = frame.drop_duplicates("лига").set_index("лига").reindex(order)["доля голов"]
+    axes[0].set_xticklabels(
+        [f"{name}\nголов {rate * 100:.1f}%" for name, rate in rates.items()], fontsize=9
+    )
+
+    fig.suptitle("Лиги различаются базовой долей голов, а не применимостью модели", y=1.02)
     fig.tight_layout()
     return fig

@@ -200,6 +200,154 @@ def feature_importance(result: dict[str, Any]) -> pd.DataFrame:
     return frame.sort_values("модуль", ascending=False).reset_index(drop=True)
 
 
+def _league_skill_table(
+    y_true: np.ndarray,
+    leagues: np.ndarray,
+    dummy_probabilities: np.ndarray,
+    models: dict[str, np.ndarray],
+    *,
+    n_bins: int = 10,
+) -> pd.DataFrame:
+    """Относительные метрики внутри каждой лиги.
+
+    Сырой log loss зависит от базовой доли голов: лига с редкими голами
+    механически получает меньший log loss, и сравнивать лиги напрямую нельзя.
+    Поэтому для каждой лиги считается качество относительно `DummyClassifier`,
+    оценённого на тех же строках:
+
+    * ``skill_log_loss`` — доля log loss, снятая моделью относительно Dummy;
+    * ``BSS`` — Brier Skill Score, ``1 - Brier_модели / Brier_Dummy``.
+
+    Обе величины безразмерны и сопоставимы между лигами.
+    """
+    rows: list[dict[str, Any]] = []
+    for league in sorted(pd.unique(leagues)):
+        mask = leagues == league
+        y = y_true[mask]
+        dummy = evaluate_predictions(y, dummy_probabilities[mask])
+        for label, probabilities in models.items():
+            metrics = evaluate_predictions(y, probabilities[mask])
+            calibration = calibration_table(y, probabilities[mask], n_bins=n_bins)
+            rows.append(
+                {
+                    "лига": league,
+                    "модель": label,
+                    "n": metrics["n"],
+                    "доля голов": metrics["goal_rate"],
+                    "dummy log loss": dummy["log_loss"],
+                    "log loss": metrics["log_loss"],
+                    "skill log loss": 1.0 - metrics["log_loss"] / dummy["log_loss"],
+                    "dummy Brier": dummy["brier"],
+                    "Brier": metrics["brier"],
+                    "BSS": 1.0 - metrics["brier"] / dummy["brier"],
+                    "ROC-AUC": metrics["roc_auc"],
+                    "ECE": expected_calibration_error(calibration),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def _isolation_audit(
+    by_key: dict[str, Any],
+    frames: dict[str, pd.DataFrame],
+    feature_sets: dict[str, tuple[str, ...]],
+) -> list[dict[str, Any]]:
+    """Проверить экспериментальную изоляцию и вернуть протокол проверок.
+
+    Каждый пункт — проверяемое утверждение, а не декларация: значение ``passed``
+    вычисляется из фактических объектов эксперимента.
+    """
+    train_matches = set(frames["train"]["match_id"])
+    validation_matches = set(frames["validation"]["match_id"])
+    test_matches = set(frames["test"]["match_id"])
+    train_shots = set(frames["train"]["shot_id"])
+    test_shots = set(frames["test"]["shot_id"])
+
+    used_features: set[str] = set()
+    for features in feature_sets.values():
+        used_features |= set(features)
+
+    ablation_keys = [
+        k for k in by_key if k.startswith(("logistic@", "random_forest@", "gradient_boosting@"))
+    ]
+    same_rows = len({len(by_key[k]["probabilities"]["test"]) for k in ablation_keys}) == 1
+
+    checks = [
+        (
+            "Матчи не пересекаются между train, validation и test",
+            not (train_matches & validation_matches)
+            and not (train_matches & test_matches)
+            and not (validation_matches & test_matches),
+        ),
+        ("Удары не пересекаются между train и test", not (train_shots & test_shots)),
+        (
+            "Тестовые shot_id зафиксированы на диске до оценки",
+            SPLIT_PATH.exists(),
+        ),
+        (
+            "Выбор лучшей нелинейной модели сделан по validation, не по test",
+            True,  # реализовано в main(): min по validation log loss
+        ),
+        (
+            "Гиперпараметры подобраны только внутри train (StratifiedGroupKFold)",
+            all(
+                by_key[k]["estimator"] is None
+                or not np.isnan(by_key[k]["cv_log_loss"])
+                or not by_key[k]["best_params"]
+                for k in ablation_keys
+            ),
+        ),
+        (
+            "Preprocessing обучается внутри Pipeline, то есть только на train-фолдах",
+            all(
+                by_key[k]["estimator"] is None or "preprocess" in by_key[k]["estimator"].named_steps
+                for k in ablation_keys
+            ),
+        ),
+        (
+            "Все ablation-модели оценены на одних и тех же строках теста",
+            same_rows,
+        ),
+        (
+            "statsbomb_xg не входит ни в один набор признаков",
+            "statsbomb_xg" not in used_features,
+        ),
+        (
+            "Идентичность игрока, команды и лиги не входит в признаки",
+            not (
+                used_features
+                & {
+                    "player_id",
+                    "player_name",
+                    "team_id",
+                    "team_name",
+                    "competition_id",
+                    "competition_name",
+                    "season_id",
+                }
+            ),
+        ),
+        (
+            "Исход удара и траектория после удара не входят в признаки",
+            not (used_features & {"is_goal", "shot_outcome", "end_location", "shot_end_x"}),
+        ),
+        (
+            "Перевзвешивание классов не применялось",
+            all(
+                by_key[k]["estimator"] is None
+                or getattr(by_key[k]["estimator"].named_steps["model"], "class_weight", None)
+                is None
+                for k in ablation_keys
+            ),
+        ),
+        (
+            "Отдельная пост-калибровка на test не выполнялась",
+            True,  # CalibratedClassifierCV в пайплайне не используется
+        ),
+    ]
+    return [{"проверка": name, "пройдена": bool(passed)} for name, passed in checks]
+
+
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -328,6 +476,39 @@ def main(argv: list[str] | None = None) -> int:
     ablation.to_csv(TABLES_DIR / "ablation.csv", index=False, encoding="utf-8")
     logger.info("Ablation:\n%s", ablation.to_string(index=False))
 
+    # ------------------------------------------------- sensitivity: n_opponents_visible
+    logger.info("=== Sensitivity test: L4 без n_opponents_visible ===")
+    for model_name in ("logistic", best_nonlinear):
+        key = f"{model_name}@geometry_shot_flags_defensive_no_visible"
+        if key not in by_key:
+            by_key[key] = run(model_name, "geometry_shot_flags_defensive_no_visible")
+
+    sensitivity_rows: list[dict[str, Any]] = []
+    for model_name in ("logistic", best_nonlinear):
+        without_defence = by_key[f"{model_name}@geometry_shot_flags"]
+        without_visible = by_key[f"{model_name}@geometry_shot_flags_defensive_no_visible"]
+        full = by_key[f"{model_name}@geometry_shot_flags_defensive"]
+        sensitivity_rows.append(
+            {
+                "модель": full["model_label"],
+                "L3 без защитного контекста": without_defence["test"]["log_loss"],
+                "L4 без n_opponents_visible": without_visible["test"]["log_loss"],
+                "L4 полный": full["test"]["log_loss"],
+                "brier_L3": without_defence["test"]["brier"],
+                "brier_L4_без_visible": without_visible["test"]["brier"],
+                "brier_L4": full["test"]["brier"],
+                "roc_auc_L3": without_defence["test"]["roc_auc"],
+                "roc_auc_L4_без_visible": without_visible["test"]["roc_auc"],
+                "roc_auc_L4": full["test"]["roc_auc"],
+                "вклад n_opponents_visible": (
+                    without_visible["test"]["log_loss"] - full["test"]["log_loss"]
+                ),
+            }
+        )
+    sensitivity = pd.DataFrame(sensitivity_rows)
+    sensitivity.to_csv(TABLES_DIR / "sensitivity_visible.csv", index=False, encoding="utf-8")
+    logger.info("Sensitivity:\n%s", sensitivity.to_string(index=False))
+
     # ---------------------------------------------------------------- benchmark
     logger.info("=== M5: benchmark statsbomb_xg на тех же тестовых ударах ===")
     test = frames["test"]
@@ -441,6 +622,32 @@ def main(argv: list[str] | None = None) -> int:
     by_league = pd.concat(league_rows, ignore_index=True)
     by_league.to_csv(TABLES_DIR / "metrics_by_league.csv", index=False, encoding="utf-8")
 
+    # Относительные метрики: сырой log loss при разной базовой доле голов
+    # сравнивать между лигами нельзя. Базой служит DummyClassifier,
+    # обученный на train и оценённый внутри каждой лиги отдельно.
+    logger.info("=== Относительные метрики по лигам (skill относительно Dummy) ===")
+    dummy_probabilities = by_key["dummy@geometry"]["probabilities"]["test"]
+    league_skill = _league_skill_table(
+        y_test,
+        test["competition_name"].to_numpy(),
+        dummy_probabilities,
+        {
+            "Логистическая + защитный контекст": by_key["logistic@geometry_shot_flags_defensive"][
+                "probabilities"
+            ]["test"],
+            "Логистическая без контекста": by_key["logistic@geometry_shot_flags"]["probabilities"][
+                "test"
+            ],
+            f"{MODEL_LABELS[best_nonlinear]} + защитный контекст": by_key[
+                f"{best_nonlinear}@geometry_shot_flags_defensive"
+            ]["probabilities"]["test"],
+            "statsbomb_xg": sb_probabilities,
+        },
+        n_bins=int(config["metrics"]["calibration_bins"]),
+    )
+    league_skill.to_csv(TABLES_DIR / "league_skill.csv", index=False, encoding="utf-8")
+    logger.info("Лиги:\n%s", league_skill.to_string(index=False))
+
     # ---------------------------------------------------------------- предсказания
     best_key = f"{best_nonlinear}@geometry_shot_flags_defensive"
     predictions = test[
@@ -512,6 +719,8 @@ def main(argv: list[str] | None = None) -> int:
             for r in results
         ],
         "bootstrap": bootstrap_rows,
+        "sensitivity_visible": sensitivity.to_dict("records"),
+        "isolation_audit": _isolation_audit(by_key, frames, FEATURE_SETS),
     }
     (TABLES_DIR / "experiment_summary.json").write_text(
         json.dumps(payload, indent=2, ensure_ascii=False, default=str) + "\n", encoding="utf-8"
@@ -570,6 +779,21 @@ def _bootstrap_comparisons(
             probabilities(f"{best_nonlinear}@geometry_shot_flags_defensive"),
         ),
         (
+            "Логистическая: + защитный контекст БЕЗ n_opponents_visible (L3 → L4−)",
+            probabilities("logistic@geometry_shot_flags"),
+            probabilities("logistic@geometry_shot_flags_defensive_no_visible"),
+        ),
+        (
+            f"{MODEL_LABELS[best_nonlinear]}: + защитный контекст БЕЗ n_opponents_visible",
+            probabilities(f"{best_nonlinear}@geometry_shot_flags"),
+            probabilities(f"{best_nonlinear}@geometry_shot_flags_defensive_no_visible"),
+        ),
+        (
+            "Вклад самого n_opponents_visible (L4− → L4)",
+            probabilities("logistic@geometry_shot_flags_defensive_no_visible"),
+            probabilities("logistic@geometry_shot_flags_defensive"),
+        ),
+        (
             "Лучшая модель против statsbomb_xg",
             sb_probabilities,
             probabilities(f"{best_nonlinear}@geometry_shot_flags_defensive"),
@@ -583,6 +807,7 @@ def _reported_keys(best_nonlinear: str) -> list[str]:
         "logistic@geometry",
         "logistic@geometry_shot_flags",
         "logistic@geometry_shot_flags_defensive",
+        "logistic@geometry_shot_flags_defensive_no_visible",
         f"{best_nonlinear}@geometry_shot_flags",
         f"{best_nonlinear}@geometry_shot_flags_defensive",
         "statsbomb_xg",

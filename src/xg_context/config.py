@@ -249,7 +249,20 @@ FEATURE_SETS: dict[str, tuple[str, ...]] = {
         *DEFENSIVE_CONTEXT_FEATURES,
     ),
     "geometry_defensive": (*GEOMETRY_FEATURES, *DEFENSIVE_CONTEXT_FEATURES),
+    # Sensitivity test: тот же уровень L4 без `n_opponents_visible`.
+    # Признак неоднозначен — он одновременно отражает и плотность обороны,
+    # и границы поля зрения камеры. Проверка нужна, чтобы понять, не держится
+    # ли главный эффект на этой неоднозначности (см. D-020).
+    "geometry_shot_flags_defensive_no_visible": (
+        *GEOMETRY_FEATURES,
+        *SHOT_CHARACTERISTIC_FEATURES,
+        *STATSBOMB_CONTEXT_FLAG_FEATURES,
+        *tuple(f for f in DEFENSIVE_CONTEXT_FEATURES if f != "n_opponents_visible"),
+    ),
 }
+
+#: Признак, вокруг которого построен sensitivity test.
+AMBIGUOUS_VISIBILITY_FEATURE: str = "n_opponents_visible"
 
 #: Флаги StatsBomb, которые присутствуют в JSON только когда равны true.
 #: Отсутствие такого поля трактуется как false — но только после явной проверки
