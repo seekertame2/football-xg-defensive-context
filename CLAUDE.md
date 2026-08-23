@@ -56,12 +56,26 @@ python -m venv .venv
 .venv/Scripts/python.exe -m pip install -e ".[dev]"   # Windows
 ```
 
+Полный пайплайн от загрузки до отчёта:
+
 ```bash
-python scripts/download_data.py --config configs/data.yaml --metadata-only
+python scripts/download_data.py --config configs/data.yaml --selection
 ```
 
 ```bash
-python scripts/audit_data.py --config configs/data.yaml
+python scripts/build_dataset.py --config configs/data.yaml
+```
+
+```bash
+python scripts/audit_data.py --selection
+```
+
+```bash
+python scripts/run_experiments.py --config configs/experiment.yaml
+```
+
+```bash
+python scripts/make_report.py
 ```
 
 ```bash
@@ -74,10 +88,22 @@ ruff check . && ruff format --check .
 
 ## Текущее состояние
 
-Завершены этапы 0 (каркас) и 1 (аудит данных). Следующий шаг — **решение владельца
-проекта** о составе выборки: заполнить `selection` в `configs/data.yaml` по
-рекомендации из `reports/data_audit.md`. До этого этап 2 не начинается.
+Завершены этапы 0–5. Выборка утверждена владельцем проекта: La Liga, Premier League,
+Serie A и Ligue 1 сезона 2015/2016 — 1517 матчей, 37 488 непенальтистских ударов.
 
-`scripts/build_dataset.py` и `scripts/run_experiments.py` — заглушки с зафиксированным
-интерфейсом; модули `splitting.py`, `preprocessing.py`, `models.py`, `evaluation.py`,
-`visualization.py` заполняются на этапах 2–5.
+Главный результат: защитный контекст улучшает log loss на 0.0119 (логистическая
+регрессия) и 0.0107 (случайный лес), доверительные интервалы парного bootstrap
+по матчам целиком ниже нуля. Готовые флаги StatsBomb значимого прироста не дают.
+Итоги — в [`reports/results.md`](reports/results.md).
+
+Не начат этап 6 (упаковка и релиз). По прямому указанию владельца в проект
+**не** добавляются нейросеть, приложение и сложные признаки StatsBomb 360.
+
+### Дополнения к структуре из спецификации
+
+- `src/xg_context/dataset.py` — построение shot-level датасета (D-006 по аналогии);
+- `src/xg_context/audit.py` — логика аудита;
+- `src/xg_context/reporting.py` — сборка markdown-отчётов;
+- `scripts/make_report.py` — графики и анализ ошибок без переобучения моделей.
+
+Все отклонения от буквы раздела 14 спецификации зафиксированы в `DECISIONS.md`.
