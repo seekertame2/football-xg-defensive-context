@@ -1,4 +1,4 @@
-"""Построение shot-level датасета утверждённой выборки (этап 2 спецификации).
+"""Построение shot-level датасета утверждённой выборки.
 
 Скрипт один раз разбирает события всех матчей выборки и делает три вещи:
 
@@ -51,8 +51,8 @@ ALL_SHOTS_PATH = PROCESSED_DATA_DIR / "all_eligible_shots.parquet"
 CONTEXT_SHOTS_PATH = PROCESSED_DATA_DIR / "context_eligible_shots.parquet"
 FULL_AUDIT_PATH = TABLES_DIR / "full_sample_audit.json"
 
-#: Ниже этого покрытия защитного контекста исследовательский дизайн
-#: пришлось бы пересматривать, и скрипт останавливается (требование владельца).
+#: Ниже этого покрытия защитного контекста дизайн исследования пришлось бы
+#: пересматривать, поэтому скрипт останавливается.
 MIN_ACCEPTABLE_CONTEXT_SHARE = 0.95
 
 #: Колонки со списками координат: нужны для расчёта признаков,
@@ -255,7 +255,7 @@ def main(argv: list[str] | None = None) -> int:
         TABLES_DIR / f"dataset_by_league{suffix}.csv", index=False, encoding="utf-8"
     )
 
-    # Останов по требованию владельца проекта, если данные оказались хуже ожидаемого.
+    # Останов, если данные оказались хуже ожидаемого.
     problems: list[str] = []
     if audit["share_with_freeze_frame"] < MIN_ACCEPTABLE_CONTEXT_SHARE:
         problems.append(
@@ -294,7 +294,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _update_manifest(config, audit: dict[str, Any], matches, all_path, context_path) -> None:
-    """Дописать в манифест всё, что требует раздел 5.4 спецификации."""
+    """Дописать в манифест состав выборки, журнал фильтрации и хеши файлов."""
     import hashlib
 
     manifest: dict[str, Any] = {}
@@ -324,8 +324,8 @@ def _update_manifest(config, audit: dict[str, Any], matches, all_path, context_p
                 "goal_rate": audit["goal_rate_all_eligible"],
                 "filter_log": audit["filter_log"],
                 "files": {
-                    "all_eligible_shots": str(all_path.relative_to(config_root())),
-                    "context_eligible_shots": str(context_path.relative_to(config_root())),
+                    "all_eligible_shots": all_path.relative_to(config_root()).as_posix(),
+                    "context_eligible_shots": context_path.relative_to(config_root()).as_posix(),
                     "all_eligible_sha256": _file_sha256(all_path),
                     "context_eligible_sha256": _file_sha256(context_path),
                 },

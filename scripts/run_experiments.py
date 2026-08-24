@@ -1,4 +1,4 @@
-"""Лестница моделей, ablation study и benchmark StatsBomb (этапы 3–5).
+"""Лестница моделей, ablation study и benchmark StatsBomb.
 
 Порядок работы:
 
@@ -89,11 +89,6 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def load_experiment_config(path: str | Path) -> dict[str, Any]:
     with Path(path).open(encoding="utf-8") as handle:
         return yaml.safe_load(handle)
-
-
-# --------------------------------------------------------------------------------------
-# Обучение и оценка
-# --------------------------------------------------------------------------------------
 
 
 def fit_and_evaluate(
@@ -366,7 +361,7 @@ def main(argv: list[str] | None = None) -> int:
         shots = shots[shots["match_id"].isin(keep)].reset_index(drop=True)
         logger.info("Режим --quick: оставлено %d ударов", len(shots))
 
-    # ---------------------------------------------------------------- разбиение
+    # разбиение
     split_config = config["split"]
     split = make_grouped_split(
         shots,
@@ -395,7 +390,7 @@ def main(argv: list[str] | None = None) -> int:
         {part: frames[part]["shot_id"].tolist() for part in frames},
     )
 
-    # ---------------------------------------------------------------- сетки
+    # сетки
     grids = _build_grids(config, quick=args.quick)
     n_splits = int(config["cross_validation"]["n_splits"]) if not args.quick else 3
 
@@ -416,7 +411,7 @@ def main(argv: list[str] | None = None) -> int:
         results.append(result)
         return result
 
-    # ---------------------------------------------------------------- лестница
+    # лестница
     logger.info("=== M0: базовая частота ===")
     run("dummy", "geometry")
 
@@ -440,7 +435,7 @@ def main(argv: list[str] | None = None) -> int:
     best_nonlinear = min(nonlinear_results, key=lambda r: r["validation"]["log_loss"])["model"]
     logger.info("Лучшая нелинейная модель по validation: %s", best_nonlinear)
 
-    # ---------------------------------------------------------------- ablation
+    # ablation
     logger.info("=== M4 и ablation: одни и те же строки, одно разбиение ===")
     ablation_rows: list[dict[str, Any]] = []
     by_key = {r["key"]: r for r in results}
@@ -476,7 +471,7 @@ def main(argv: list[str] | None = None) -> int:
     ablation.to_csv(TABLES_DIR / "ablation.csv", index=False, encoding="utf-8")
     logger.info("Ablation:\n%s", ablation.to_string(index=False))
 
-    # ------------------------------------------------- sensitivity: n_opponents_visible
+    # sensitivity: n_opponents_visible
     logger.info("=== Sensitivity test: L4 без n_opponents_visible ===")
     for model_name in ("logistic", best_nonlinear):
         key = f"{model_name}@geometry_shot_flags_defensive_no_visible"
@@ -509,7 +504,7 @@ def main(argv: list[str] | None = None) -> int:
     sensitivity.to_csv(TABLES_DIR / "sensitivity_visible.csv", index=False, encoding="utf-8")
     logger.info("Sensitivity:\n%s", sensitivity.to_string(index=False))
 
-    # ---------------------------------------------------------------- benchmark
+    # benchmark
     logger.info("=== M5: benchmark statsbomb_xg на тех же тестовых ударах ===")
     test = frames["test"]
     y_test = test["is_goal"].to_numpy()
@@ -538,12 +533,12 @@ def main(argv: list[str] | None = None) -> int:
         "statsbomb_xg: test log loss=%.5f brier=%.5f", sb_metrics["log_loss"], sb_metrics["brier"]
     )
 
-    # ---------------------------------------------------------------- таблицы
+    # таблицы
     final = pd.DataFrame([flatten_result(r) for r in results])
     final = final.sort_values("test_log_loss").reset_index(drop=True)
     final.to_csv(TABLES_DIR / "model_metrics.csv", index=False, encoding="utf-8")
 
-    # ---------------------------------------------------------------- калибровка
+    # калибровка
     calibrations: dict[str, pd.DataFrame] = {}
     ece_rows: list[dict[str, Any]] = []
     for result in results:
@@ -573,7 +568,7 @@ def main(argv: list[str] | None = None) -> int:
         TABLES_DIR / "calibration_summary.csv", index=False, encoding="utf-8"
     )
 
-    # ---------------------------------------------------------------- bootstrap
+    # bootstrap
     logger.info("=== Парный bootstrap по матчам ===")
     n_bootstrap = 50 if args.quick else int(config["uncertainty"]["n_bootstrap"])
     confidence = float(config["uncertainty"]["confidence_level"])
@@ -604,7 +599,7 @@ def main(argv: list[str] | None = None) -> int:
     columns = ["сравнение", *[c for c in bootstrap.columns if c != "сравнение"]]
     bootstrap[columns].to_csv(TABLES_DIR / "bootstrap.csv", index=False, encoding="utf-8")
 
-    # ---------------------------------------------------------------- по лигам
+    # по лигам
     logger.info("=== Метрики по лигам ===")
     league_rows: list[pd.DataFrame] = []
     for key in _reported_keys(best_nonlinear):
@@ -648,7 +643,7 @@ def main(argv: list[str] | None = None) -> int:
     league_skill.to_csv(TABLES_DIR / "league_skill.csv", index=False, encoding="utf-8")
     logger.info("Лиги:\n%s", league_skill.to_string(index=False))
 
-    # ---------------------------------------------------------------- предсказания
+    # предсказания
     best_key = f"{best_nonlinear}@geometry_shot_flags_defensive"
     predictions = test[
         [
@@ -685,7 +680,7 @@ def main(argv: list[str] | None = None) -> int:
     predictions.to_parquet(PREDICTIONS_PATH, index=False)
     logger.info("Предсказания на тесте сохранены: %s", PREDICTIONS_PATH)
 
-    # ---------------------------------------------------------------- важность признаков
+    # важность признаков
     for key in ("logistic@geometry_shot_flags_defensive", best_key):
         importance = feature_importance(by_key[key])
         if importance.empty:
@@ -697,7 +692,7 @@ def main(argv: list[str] | None = None) -> int:
         )
         logger.info("Важность признаков %s:\n%s", key, importance.head(12).to_string(index=False))
 
-    # ---------------------------------------------------------------- сводка
+    # сводка
     payload = {
         "seed": seed,
         "n_shots": len(shots),

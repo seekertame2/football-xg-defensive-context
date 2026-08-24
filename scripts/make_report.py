@@ -1,4 +1,4 @@
-"""Графики, анализ ошибок и итоговый отчёт (этап 5 спецификации).
+"""Графики, анализ ошибок и итоговый отчёт.
 
 Скрипт читает результаты `scripts/run_experiments.py` и не переобучает
 лестницу моделей. Исключение — одна логистическая регрессия, которая нужна,
@@ -74,17 +74,12 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-# --------------------------------------------------------------------------------------
-# Анализ ошибок
-# --------------------------------------------------------------------------------------
-
-
 def build_subgroups(predictions: pd.DataFrame) -> pd.DataFrame:
     """Сравнить качество моделей без и с защитным контекстом по подгруппам ударов.
 
-    Подгруппы выбраны по спецификации (раздел 13): удары головой против ударов
-    ногой, центр против острых углов, open play против стандартов, плотная
-    оборона против открытых моментов, ближние против дальних.
+    Подгруппы: удары головой против ударов ногой, центр против острых углов,
+    open play против стандартов, плотная оборона против открытых моментов,
+    ближние против дальних.
     """
     frame = predictions
     angle_deg = np.degrees(frame["shot_angle"])
@@ -186,11 +181,6 @@ def load_freeze_frames(config_path: str, shot_ids: list[str], match_ids: list[in
     return frames
 
 
-# --------------------------------------------------------------------------------------
-# Основной сценарий
-# --------------------------------------------------------------------------------------
-
-
 def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(
         level=logging.INFO,
@@ -208,17 +198,17 @@ def main(argv: list[str] | None = None) -> int:
     summary = json.loads((TABLES_DIR / "experiment_summary.json").read_text(encoding="utf-8"))
     logger.info("Тестовых ударов: %d", len(predictions))
 
-    # ------------------------------------------------------------------ данные
+    # данные
     logger.info("Графики: обзор данных")
     save_figure(plot_sample_overview(by_league), FIGURES_DIR / "01_sample_overview.png")
     save_figure(plot_shot_map(shots), FIGURES_DIR / "02_shot_map.png")
     save_figure(plot_goal_rate_by_geometry(shots), FIGURES_DIR / "03_goal_rate_by_geometry.png")
 
-    # ------------------------------------------------------------------ ablation
+    # ablation
     logger.info("Графики: ablation")
     save_figure(plot_ablation(ablation), FIGURES_DIR / "04_ablation.png")
 
-    # ------------------------------------------------------------------ калибровка
+    # калибровка
     logger.info("Графики: калибровка")
     best_key = summary["best_model_key"]
     curves = {
@@ -235,7 +225,7 @@ def main(argv: list[str] | None = None) -> int:
             tables[label] = pd.read_csv(path)
     save_figure(plot_calibration(tables), FIGURES_DIR / "05_calibration.png")
 
-    # ------------------------------------------------------------------ важность
+    # важность
     logger.info("Графики: важность признаков")
     importance_path = TABLES_DIR / "feature_importance_logistic_geometry_shot_flags_defensive.csv"
     if importance_path.exists():
@@ -244,7 +234,7 @@ def main(argv: list[str] | None = None) -> int:
         importance["признак"] = importance["признак"].str.replace("cat__", "", regex=False)
         save_figure(plot_feature_importance(importance), FIGURES_DIR / "06_feature_importance.png")
 
-    # ------------------------------------------------------------------ карта xG
+    # карта xG
     logger.info("Графики: карта xG для контролируемого сценария")
     split = load_split(SPLIT_PATH)
     train_matches = set(split["match_ids"]["train"])
@@ -296,7 +286,7 @@ def main(argv: list[str] | None = None) -> int:
         FIGURES_DIR / "07_xg_surface.png",
     )
 
-    # ------------------------------------------------------------------ sensitivity
+    # sensitivity
     bootstrap = pd.read_csv(TABLES_DIR / "bootstrap.csv")
     logger.info("Графики: sensitivity test")
     save_figure(plot_sensitivity(bootstrap), FIGURES_DIR / "10_sensitivity.png")
@@ -306,7 +296,7 @@ def main(argv: list[str] | None = None) -> int:
         logger.info("Графики: относительное качество по лигам")
         save_figure(plot_league_skill(pd.read_csv(skill_path)), FIGURES_DIR / "11_league_skill.png")
 
-    # ------------------------------------------------------------------ ошибки
+    # ошибки
     logger.info("Анализ ошибок по подгруппам")
     subgroups = build_subgroups(predictions)
     subgroups.to_csv(TABLES_DIR / "error_analysis.csv", index=False, encoding="utf-8")
@@ -318,7 +308,7 @@ def main(argv: list[str] | None = None) -> int:
         ].to_string(index=False),
     )
 
-    # ------------------------------------------------------------------ примеры
+    # примеры
     examples = pick_examples(predictions)
     examples.to_csv(TABLES_DIR / "example_shots.csv", index=False, encoding="utf-8")
 

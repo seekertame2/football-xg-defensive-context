@@ -3,7 +3,7 @@
   "source_permalink": "https://github.com/hudl/open-data/tree/b0bc9f22dd77c206ddedc1d742893b3bbe64baec",
   "commit_sha": "b0bc9f22dd77c206ddedc1d742893b3bbe64baec",
   "downloaded_at": "2026-08-23T15:11:27+00:00",
-  "dataset_config_version": "0.1.0",
+  "dataset_config_version": "1.0.0",
   "stage": "dataset_built",
   "n_competition_seasons": 80,
   "n_matches_in_metadata": 3961,
@@ -32,7 +32,7 @@
     ],
     "include_three_sixty": false
   },
-  "note": "Числа ударов, доля защитного контекста и хеши датасета добавляются на этапе 2 скриптом scripts/build_dataset.py.",
+  "note": "Числа ударов, доля защитного контекста и хеши датасета добавляются скриптом scripts/build_dataset.py.",
   "audit": {
     "generated_at": "2026-08-23T15:32:07+00:00",
     "matches_per_season": 3,
@@ -118,7 +118,7 @@
       },
       {
         "step": "drop_penalties",
-        "description": "Пенальти и удары серии пенальти (спецификация, раздел 8.3)",
+        "description": "Пенальти и удары серии пенальти",
         "n_before": 37888,
         "n_after": 37488,
         "n_dropped": 400,
@@ -166,8 +166,8 @@
       }
     ],
     "files": {
-      "all_eligible_shots": "data\\processed\\all_eligible_shots.parquet",
-      "context_eligible_shots": "data\\processed\\context_eligible_shots.parquet",
+      "all_eligible_shots": "data/processed/all_eligible_shots.parquet",
+      "context_eligible_shots": "data/processed/context_eligible_shots.parquet",
       "all_eligible_sha256": "1c58c1665ad9b9a8856783ed5b27cc0dfda967489f63fca2952aeda70cdba23e",
       "context_eligible_sha256": "1bc27e8f21ef6d048536e646a597df45457cdc924f9914c9ca446d484f1d29d6"
     }

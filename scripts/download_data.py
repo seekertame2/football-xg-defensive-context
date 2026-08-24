@@ -200,7 +200,7 @@ def _write_stub_manifest(config, competitions, matches_by_season, inventory, dow
     """Записать манифест уровня метаданных.
 
     Полный манифест с числом ударов и долей защитного контекста дополняется
-    на этапе 2 при построении датасета (спецификация, раздел 5.4).
+    при построении датасета.
     """
     manifest = {
         "source_url": config.source.source_url,
@@ -217,7 +217,7 @@ def _write_stub_manifest(config, competitions, matches_by_season, inventory, dow
         "selection": config.selection,
         "note": (
             "Числа ударов, доля защитного контекста и хеши датасета добавляются "
-            "на этапе 2 скриптом scripts/build_dataset.py."
+            "скриптом scripts/build_dataset.py."
         ),
     }
     DATA_MANIFEST_PATH.parent.mkdir(parents=True, exist_ok=True)

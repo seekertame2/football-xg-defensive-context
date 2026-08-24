@@ -1,4 +1,4 @@
-"""Тесты защиты от leakage (спецификация, разделы 9.4 и 17).
+"""Тесты защиты от leakage.
 
 Проверяется контракт списков колонок и то, что пайплайн падает,
 если запрещённое поле попало в матрицу признаков.
@@ -102,9 +102,7 @@ class TestForbiddenColumnGuard:
             assert_no_forbidden_columns(["is_goal"], context="матрица X_train")
 
 
-# --------------------------------------------------------------------------------------
-# Расширенные проверки этапов 2–4: наборы признаков, препроцессор и готовый датасет
-# --------------------------------------------------------------------------------------
+# Наборы признаков, препроцессор и готовый датасет
 
 
 class TestFeatureSetsAreClean:
@@ -124,7 +122,7 @@ class TestFeatureSetsAreClean:
         assert "statsbomb_xg" not in FEATURE_SETS[name]
 
     def test_league_identity_is_excluded_from_features(self) -> None:
-        """Решение владельца: лига используется для разбиения, но не как признак."""
+        """Лига используется для разбиения и аналитики, но не как признак."""
         for name, features in FEATURE_SETS.items():
             assert "competition_id" not in features, name
             assert "competition_name" not in features, name

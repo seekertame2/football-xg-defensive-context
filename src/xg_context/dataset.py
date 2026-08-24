@@ -1,17 +1,8 @@
-"""Построение shot-level датасета из сырых событий StatsBomb (этап 2).
+"""Путь от сырого JSON StatsBomb к таблице ударов с признаками.
 
-Модуль отвечает за путь «сырой JSON → таблица ударов с признаками»:
-
-* разбор событий удара и его ``shot.freeze_frame``;
-* явный target mapping и фильтры с подсчётом удалённых строк на каждом шаге;
-* проверка схемы: неизвестные исходы и «разреженные» булевы поля;
-* геометрия удара и пространственный контекст обороны;
-* две выборки — ``all_eligible_shots`` и ``context_eligible_shots``.
-
-Важное ограничение: ``shot.freeze_frame`` показывает только игроков, попавших
-в кадр, а не всех, кто был на поле. Поэтому все счётчики соперников — это
-«сколько видно», и число видимых сохраняется отдельной колонкой
-``n_opponents_visible``.
+``shot.freeze_frame`` показывает только игроков, попавших в кадр, а не всех,
+кто был на поле. Поэтому все счётчики соперников означают «сколько видно»,
+и число видимых сохраняется отдельной колонкой ``n_opponents_visible``.
 """
 
 from __future__ import annotations
@@ -48,17 +39,12 @@ __all__ = [
 ]
 
 
-# --------------------------------------------------------------------------------------
-# Журнал фильтрации
-# --------------------------------------------------------------------------------------
-
-
 @dataclass
 class FilterLog:
     """Счётчики строк на каждом шаге фильтрации.
 
-    Спецификация (раздел 9.5) требует, чтобы каждый фильтр показывал число
-    удалённых строк. Журнал попадает в отчёт и в `data_manifest.json`.
+    Каждый фильтр показывает, сколько строк удалил. Журнал попадает в отчёт
+    и в `data_manifest.json`.
     """
 
     steps: list[dict[str, Any]] = field(default_factory=list)
@@ -104,8 +90,7 @@ class SchemaReport:
     def sparse_booleans_confirmed(self) -> dict[str, bool]:
         """Для каких полей подтверждено, что значение ``false`` не встречается.
 
-        Только для таких полей отсутствие поля можно трактовать как ``False``
-        (спецификация, раздел 9.5).
+        Только для таких полей отсутствие поля можно трактовать как ``False``.
         """
         return {
             name: (counts.get("False", 0) == 0)
@@ -122,11 +107,6 @@ class SchemaReport:
             "boolean_values": self.boolean_values,
             "sparse_booleans_confirmed": self.sparse_booleans_confirmed,
         }
-
-
-# --------------------------------------------------------------------------------------
-# Разбор событий
-# --------------------------------------------------------------------------------------
 
 
 def _valid_location(location: Any) -> bool:
@@ -235,7 +215,6 @@ def extract_shot_rows(
 
         rows.append(
             {
-                # служебные поля
                 "shot_id": event.get("id"),
                 "match_id": int(match_meta["match_id"]),
                 "competition_id": int(match_meta["competition_id"]),
@@ -249,10 +228,8 @@ def extract_shot_rows(
                 "player_name": (event.get("player") or {}).get("name"),
                 "team_id": (event.get("team") or {}).get("id"),
                 "team_name": (event.get("team") or {}).get("name"),
-                # target и его источник
                 "shot_outcome": outcome_name,
                 "outcome_is_known": outcome_name in KNOWN_SHOT_OUTCOMES,
-                # характеристики удара
                 "shot_type": shot_type_name,
                 "is_penalty": is_penalty_shot(shot_type_name, event.get("period")),
                 "play_pattern": (event.get("play_pattern") or {}).get("name"),
@@ -262,13 +239,10 @@ def extract_shot_rows(
                 "under_pressure": bool(event.get("under_pressure", False)),
                 "one_on_one": bool(shot.get("one_on_one", False)),
                 "open_goal": bool(shot.get("open_goal", False)),
-                # benchmark
                 "statsbomb_xg": shot.get("statsbomb_xg"),
-                # координаты
                 "has_location": has_location,
                 "shot_x": float(location[0]) if has_location else np.nan,
                 "shot_y": float(location[1]) if has_location else np.nan,
-                # freeze frame
                 "has_freeze_frame": frame["has_freeze_frame"],
                 "opponent_x": frame["opponent_x"],
                 "opponent_y": frame["opponent_y"],
@@ -279,11 +253,6 @@ def extract_shot_rows(
             }
         )
     return rows
-
-
-# --------------------------------------------------------------------------------------
-# Фильтры
-# --------------------------------------------------------------------------------------
 
 
 def apply_shot_filters(frame: pd.DataFrame, log: FilterLog) -> pd.DataFrame:
@@ -298,7 +267,7 @@ def apply_shot_filters(frame: pd.DataFrame, log: FilterLog) -> pd.DataFrame:
     frame = frame[~frame["is_penalty"].astype(bool)]
     log.record(
         "drop_penalties",
-        "Пенальти и удары серии пенальти (спецификация, раздел 8.3)",
+        "Пенальти и удары серии пенальти",
         before,
         len(frame),
     )
@@ -327,17 +296,11 @@ def apply_shot_filters(frame: pd.DataFrame, log: FilterLog) -> pd.DataFrame:
     return frame.reset_index(drop=True)
 
 
-# --------------------------------------------------------------------------------------
-# Признаки
-# --------------------------------------------------------------------------------------
-
-
 def add_target(frame: pd.DataFrame) -> pd.DataFrame:
     """Проставить бинарный target по исходу удара.
 
-    Используется строгий `map_shot_outcome`: любой исход вне известной схемы
-    StatsBomb поднимает исключение, а не превращается молча в не-гол
-    (спецификация, раздел 8.2).
+    Любой исход вне известной схемы StatsBomb поднимает исключение,
+    а не превращается молча в не-гол.
     """
     frame = frame.copy()
     frame["is_goal"] = [map_shot_outcome(value) for value in frame["shot_outcome"]]

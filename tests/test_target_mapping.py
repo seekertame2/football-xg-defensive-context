@@ -1,4 +1,4 @@
-"""Тесты target mapping (спецификация, разделы 8.2 и 17)."""
+"""Тесты target mapping."""
 
 from __future__ import annotations
 

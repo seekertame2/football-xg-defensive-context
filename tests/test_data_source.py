@@ -1,4 +1,4 @@
-"""Тесты загрузчика и инвентаризации источника (спецификация, раздел 5).
+"""Тесты загрузчика и инвентаризации источника.
 
 Сеть здесь не используется: проверяются построение URL от зафиксированного
 commit SHA, раскладка кеша, разбор git-tree и оценка объёма загрузки.
@@ -169,7 +169,7 @@ class TestProjectDataConfig:
         assert config.source.repo == "hudl/open-data"
 
     def test_selection_is_approved_and_well_formed(self) -> None:
-        """Выборка утверждена человеком после аудита (спецификация, раздел 6).
+        """Выборка утверждена человеком после аудита.
 
         До утверждения `approved` был False и загрузка отказывалась работать;
         после утверждения контракт другой — состав должен быть непустым
@@ -184,7 +184,7 @@ class TestProjectDataConfig:
             assert isinstance(item["competition_id"], int)
             assert isinstance(item["season_id"], int)
         assert selection.get("include_three_sixty") is False, (
-            "StatsBomb 360 не используется: ни один матч выборки не имеет файла 360 (D-010)"
+            "StatsBomb 360 не используется: ни один матч выборки не имеет файла 360"
         )
 
     def test_selection_matches_the_approved_four_leagues(self) -> None:
