@@ -1,8 +1,9 @@
 """Воспроизводимая избирательная загрузка StatsBomb Open Data.
 
 Скрипт никогда не клонирует источник целиком: полный объём — около 16 ГБ.
-Он скачивает метаданные (около 7 МБ), а события и файлы 360 — только для
-явно заданного набора матчей, с локальным кешем и оценкой объёма заранее.
+Метаданные скачиваются целиком, это около 7 МБ.
+События и файлы 360 скачиваются только для явно заданного набора матчей.
+Объём известен заранее, а скачанное попадает в локальный кеш.
 
 Примеры
 -------
@@ -199,8 +200,7 @@ def main(argv: list[str] | None = None) -> int:
 def _write_stub_manifest(config, competitions, matches_by_season, inventory, downloader) -> None:
     """Записать манифест уровня метаданных.
 
-    Полный манифест с числом ударов и долей защитного контекста дополняется
-    при построении датасета.
+    Полный манифест с числом ударов и долей защитного контекста дополняется при построении датасета.
     """
     manifest = {
         "source_url": config.source.source_url,
@@ -213,7 +213,6 @@ def _write_stub_manifest(config, competitions, matches_by_season, inventory, dow
         "n_matches_in_metadata": sum(len(v) for v in matches_by_season.values()),
         "n_match_event_files_in_source": len(inventory.match_ids_with_events()),
         "n_match_360_files_in_source": len(inventory.match_ids_with_three_sixty()),
-        "n_files_cached_locally": downloader.files_downloaded + downloader.files_from_cache,
         "selection": config.selection,
         "note": (
             "Числа ударов, доля защитного контекста и хеши датасета добавляются "

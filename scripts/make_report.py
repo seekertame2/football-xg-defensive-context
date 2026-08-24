@@ -1,9 +1,8 @@
 """Графики, анализ ошибок и итоговый отчёт.
 
-Скрипт читает результаты `scripts/run_experiments.py` и не переобучает
-лестницу моделей. Исключение — одна логистическая регрессия, которая нужна,
-чтобы построить карту xG по полю для контролируемого сценария; она обучается
-на том же train из сохранённого разбиения.
+Скрипт читает результаты `scripts/run_experiments.py` и не переобучает лестницу моделей.
+Исключение это одна логистическая регрессия для карты xG по полю.
+Она обучается на том же train из сохранённого разбиения.
 
 Запуск::
 
@@ -77,9 +76,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 def build_subgroups(predictions: pd.DataFrame) -> pd.DataFrame:
     """Сравнить качество моделей без и с защитным контекстом по подгруппам ударов.
 
-    Подгруппы: удары головой против ударов ногой, центр против острых углов,
-    open play против стандартов, плотная оборона против открытых моментов,
-    ближние против дальних.
+    Подгруппы: удары головой против ударов ногой и центр против острых углов.
+    Дальше open play против стандартов и плотная оборона против открытых моментов.
+    Отдельно сравниваются ближние и дальние удары.
     """
     frame = predictions
     angle_deg = np.degrees(frame["shot_angle"])
@@ -89,18 +88,18 @@ def build_subgroups(predictions: pd.DataFrame) -> pd.DataFrame:
         ("Удары ногой", frame["body_part"].isin(["Right Foot", "Left Foot"])),
         ("Острый угол (< 15°)", angle_deg < 15),
         ("Центральная позиция (> 30°)", angle_deg > 30),
-        ("Ближние удары (< 12 ярдов)", frame["shot_distance"] < 12),
+        ("Ближние удары (< 12 единиц)", frame["shot_distance"] < 12),
         ("Средняя дистанция (12–20)", frame["shot_distance"].between(12, 20)),
-        ("Дальние удары (> 20 ярдов)", frame["shot_distance"] > 20),
+        ("Дальние удары (> 20 единиц)", frame["shot_distance"] > 20),
         ("Open play", frame["shot_type"] == "Open Play"),
         ("Стандарты", frame["shot_type"] != "Open Play"),
         ("Открытый момент (0 в конусе)", frame["opponents_in_shot_cone"] == 0),
         ("Плотная оборона (2+ в конусе)", frame["opponents_in_shot_cone"] >= 2),
         ("Под давлением", frame["under_pressure"].astype(bool)),
         ("Без давления", ~frame["under_pressure"].astype(bool)),
-        ("Ближайший соперник < 2 ярдов", frame["nearest_opponent_distance"] < 2),
-        ("Ближайший соперник > 5 ярдов", frame["nearest_opponent_distance"] > 5),
-        ("Вратарь вышел (> 3 ярдов)", frame["goalkeeper_distance_to_goal_line"] > 3),
+        ("Ближайший соперник < 2 единиц", frame["nearest_opponent_distance"] < 2),
+        ("Ближайший соперник > 5 единиц", frame["nearest_opponent_distance"] > 5),
+        ("Вратарь вышел (> 3 единиц)", frame["goalkeeper_distance_to_goal_line"] > 3),
     ]
 
     rows: list[dict[str, Any]] = []
@@ -257,7 +256,7 @@ def main(argv: list[str] | None = None) -> int:
 
     scenarios = [
         (
-            "Открытый момент: никого в конусе,\nближайший соперник в 6 ярдах",
+            "Открытый момент: никого в конусе,\nближайший соперник в 6 единицах",
             {
                 "opponents_in_shot_cone": 0,
                 "opponents_between_shot_and_goal": 1,
@@ -269,7 +268,7 @@ def main(argv: list[str] | None = None) -> int:
             },
         ),
         (
-            "Плотная оборона: трое в конусе,\nближайший соперник в 1 ярде",
+            "Плотная оборона: трое в конусе,\nближайший соперник в 1 единице",
             {
                 "opponents_in_shot_cone": 3,
                 "opponents_between_shot_and_goal": 5,
@@ -314,8 +313,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.skip_freeze_frames:
         logger.info("Графики: примеры freeze frame")
-        # По одному удару на каждую причину: иначе все примеры окажутся
-        # из одной категории и рисунок ничего не сравнивает.
+        # По одному удару на каждую причину.
+        # Иначе все примеры окажутся из одной категории и рисунок ничего не сравнит.
         picked = (
             examples.drop_duplicates("shot_id")
             .groupby("причина", sort=False)
@@ -336,9 +335,9 @@ def main(argv: list[str] | None = None) -> int:
                     **frame,
                     "title": f"{row.competition_name}: {row.причина}",
                     "caption": (
-                        f"расстояние {row.shot_distance:.1f} ярда\n"
+                        f"расстояние {row.shot_distance:.1f}\n"
                         f"в конусе: {int(row.opponents_in_shot_cone)}\n"
-                        f"ближайший: {row.nearest_opponent_distance:.1f} ярда\n"
+                        f"ближайший: {row.nearest_opponent_distance:.1f}\n"
                         f"без контекста {row.p_logistic_no_defense:.3f} → "
                         f"с контекстом {row.p_logistic_defense:.3f}\n"
                         f"statsbomb_xg {row.statsbomb_xg:.3f}, "

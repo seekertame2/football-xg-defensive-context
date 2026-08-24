@@ -47,8 +47,8 @@ def test_unknown_outcome_raises(outcome: str) -> None:
 def test_plausible_but_wrong_spellings_are_rejected(outcome: str) -> None:
     """Регрессия: написание исходов сверено с данными, догадки не принимаются.
 
-    Первая версия проекта использовала "Saved Off T" и "Saved To Post"; аудит
-    показал, что StatsBomb пишет "Saved Off Target" и "Saved to Post".
+    Первая версия проекта использовала "Saved Off T" и "Saved To Post".
+    Аудит показал, что StatsBomb пишет "Saved Off Target" и "Saved to Post".
     """
     with pytest.raises(UnknownShotOutcomeError):
         map_shot_outcome(outcome)

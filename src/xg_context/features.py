@@ -38,13 +38,13 @@ def map_shot_outcome(outcome_name: str | None) -> int:
 
     ``Goal`` даёт 1, любой другой **известный** исход — 0.
 
-    Неизвестный или отсутствующий исход это ошибка данных. Молча превращать его
-    в 0 нельзя: так занизилась бы доля голов и испортилась бы калибровка.
+    Неизвестный или отсутствующий исход это ошибка данных.
+    Молча превращать его в 0 нельзя: так занизилась бы доля голов и испортилась бы калибровка.
 
     Raises
     ------
     UnknownShotOutcomeError
-        Если исход равен ``None`` или отсутствует в :data:`KNOWN_SHOT_OUTCOMES`.
+        Если исход равен ``None`` или отсутствует в `KNOWN_SHOT_OUTCOMES`.
     """
     if outcome_name is None:
         raise UnknownShotOutcomeError(
@@ -59,7 +59,7 @@ def map_shot_outcome(outcome_name: str | None) -> int:
 
 
 def map_shot_outcomes(outcomes: Iterable[str | None]) -> list[int]:
-    """Векторная версия :func:`map_shot_outcome` с той же строгостью."""
+    """Векторная версия `map_shot_outcome` с той же строгостью."""
     return [map_shot_outcome(outcome) for outcome in outcomes]
 
 
@@ -99,7 +99,8 @@ def assert_no_forbidden_columns(
         if name in forbidden_set:
             hits.append(name)
             continue
-        # one-hot и производные колонки: `<forbidden>_<value>` либо `<prefix>__<forbidden>`
+        # one-hot и производные колонки:
+        # `<forbidden>_<value>` либо `<prefix>__<forbidden>`
         bare = name.split("__")[-1]
         if bare in forbidden_set:
             hits.append(name)

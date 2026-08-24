@@ -1,11 +1,11 @@
 """Вероятностные метрики, калибровка и оценка неопределённости.
 
-Главные метрики это log loss и калибровка: xG оценивается как вероятностная
-модель, а не как классификатор. ROC-AUC и PR-AUC идут дополнительно.
+Главные метрики это log loss и калибровка.
+xG оценивается как вероятностная модель, а не как классификатор.
+ROC-AUC и PR-AUC идут дополнительно.
 
-Неопределённость считается парным bootstrap по матчам, а не по отдельным
-ударам. Удары одного матча зависимы, и bootstrap по строкам занизил бы
-доверительные интервалы.
+Неопределённость считается парным bootstrap по матчам, а не по отдельным ударам.
+Удары одного матча зависимы, и bootstrap по строкам занизил бы доверительные интервалы.
 """
 
 from __future__ import annotations
@@ -28,16 +28,29 @@ logger = logging.getLogger(__name__)
 __all__ = [
     "calibration_table",
     "evaluate_predictions",
+    "interval_excludes_zero",
     "metrics_by_group",
     "paired_bootstrap_by_match",
 ]
 
-#: Обрезка вероятностей: log loss обращается в бесконечность на 0 и 1.
+# Обрезка вероятностей: log loss обращается в бесконечность на 0 и 1.
 PROBABILITY_EPS = 1e-15
 
 
 def _clip(probabilities: Sequence[float] | np.ndarray) -> np.ndarray:
     return np.clip(np.asarray(probabilities, dtype=float), PROBABILITY_EPS, 1 - PROBABILITY_EPS)
+
+
+def interval_excludes_zero(low: float, high: float) -> bool:
+    """Устойчива ли разница: интервал целиком по одну сторону от нуля.
+
+    Знак значения не важен.
+    Устойчиво лучше и устойчиво хуже это одинаково содержательный результат.
+    Интервал через ноль означает, что различия не обнаружено.
+    """
+    if not np.isfinite(low) or not np.isfinite(high):
+        return False
+    return bool((low < 0 and high < 0) or (low > 0 and high > 0))
 
 
 def evaluate_predictions(
@@ -46,8 +59,8 @@ def evaluate_predictions(
 ) -> dict[str, float]:
     """Посчитать основные и дополнительные метрики одного набора предсказаний.
 
-    ROC-AUC и PR-AUC не определены, если в выборке один класс: в этом случае
-    возвращается ``NaN``, а не искусственное значение.
+    ROC-AUC и PR-AUC не определены, если в выборке один класс.
+    Тогда возвращается ``NaN``, а не искусственное значение.
     """
     y_true = np.asarray(y_true, dtype=int)
     probabilities = _clip(y_prob)
@@ -79,8 +92,8 @@ def calibration_table(
 ) -> pd.DataFrame:
     """Таблица калибровки: предсказанная и наблюдаемая доля голов по бинам.
 
-    Возвращает размеры бинов — без них reliability curve нечитаема:
-    крайние бины часто содержат единицы наблюдений.
+    Возвращает и размеры бинов.
+    Без них reliability curve нечитаема: крайние бины часто очень малы.
 
     Parameters
     ----------
@@ -173,9 +186,9 @@ def paired_bootstrap_by_match(
 ) -> dict[str, Any]:
     """Парный bootstrap разницы метрик с ресемплингом **матчей**.
 
-    Обе модели оцениваются на одних и тех же ресемплированных матчах, поэтому
-    из разницы уходит общая дисперсия «лёгких» и «трудных» матчей, а остаётся
-    именно эффект признаков.
+    Обе модели оцениваются на одних и тех же ресемплированных матчах.
+    Поэтому из разницы уходит общая дисперсия лёгких и трудных матчей.
+    Остаётся именно эффект признаков.
 
     Отрицательная разница означает, что кандидат лучше базовой модели:
     и log loss, и Brier score — метрики «чем меньше, тем лучше».
@@ -232,9 +245,9 @@ def paired_bootstrap_by_match(
         "delta_log_loss": observed_log,
         "delta_log_loss_ci_low": log_low,
         "delta_log_loss_ci_high": log_high,
-        "delta_log_loss_significant": bool(log_low < 0 and log_high < 0),
+        "delta_log_loss_significant": interval_excludes_zero(log_low, log_high),
         "delta_brier": observed_brier,
         "delta_brier_ci_low": brier_low,
         "delta_brier_ci_high": brier_high,
-        "delta_brier_significant": bool(brier_low < 0 and brier_high < 0),
+        "delta_brier_significant": interval_excludes_zero(brier_low, brier_high),
     }

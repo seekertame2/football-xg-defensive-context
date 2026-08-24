@@ -51,12 +51,11 @@ ALL_SHOTS_PATH = PROCESSED_DATA_DIR / "all_eligible_shots.parquet"
 CONTEXT_SHOTS_PATH = PROCESSED_DATA_DIR / "context_eligible_shots.parquet"
 FULL_AUDIT_PATH = TABLES_DIR / "full_sample_audit.json"
 
-#: Ниже этого покрытия защитного контекста дизайн исследования пришлось бы
-#: пересматривать, поэтому скрипт останавливается.
+# Ниже этого покрытия защитного контекста дизайн пришлось бы пересматривать.
+# Поэтому скрипт останавливается.
 MIN_ACCEPTABLE_CONTEXT_SHARE = 0.95
 
-#: Колонки со списками координат: нужны для расчёта признаков,
-#: но в итоговых таблицах не хранятся.
+# Колонки со списками координат: нужны для расчёта признаков, но в итоговых таблицах не хранятся.
 FRAME_COLUMNS = ("opponent_x", "opponent_y")
 
 
@@ -156,9 +155,8 @@ def build_full_sample_audit(
 def _spread_across_competitions(matches: list[dict[str, Any]], limit: int) -> list[dict[str, Any]]:
     """Взять ограниченное число матчей поровну из каждого соревнования.
 
-    Простое срезание первых N дало бы матчи одной лиги: список отсортирован
-    по competition_id. Тогда smoke-прогон не проверил бы ни балансировку
-    разбиения по лигам, ни разрез метрик по ним.
+    Простое срезание первых N дало бы матчи одной лиги: список отсортирован по competition_id.
+    Тогда smoke-прогон не проверил бы ни балансировку разбиения по лигам, ни разрез метрик по ним.
     """
     by_competition: dict[int, list[dict[str, Any]]] = {}
     for match in matches:
@@ -192,7 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.quick:
         limit = 40
         suffix = "_quick"
-        logger.info("Режим --quick: 20 матчей, вывод с суффиксом _quick.")
+        logger.info("Режим --quick: 40 матчей, по 10 на лигу, вывод с суффиксом _quick.")
 
     downloader = build_downloader(config)
     matches = load_selected_matches(downloader, selection)

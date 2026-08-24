@@ -1,9 +1,9 @@
 """Сборка markdown-отчёта из посчитанных таблиц.
 
-Весь текст строится из чисел, полученных пайплайном. Формулировки о значимости
-выбирает код по фактическим доверительным интервалам, а не автор текста.
-Если интервал разницы включает ноль, пишем «устойчивого различия не обнаружено»,
-а не «модели равны».
+Весь текст строится из чисел, полученных пайплайном.
+Формулировки о значимости выбирает код по фактическим доверительным интервалам, а не автор текста.
+Если интервал разницы включает ноль, пишем «различия не обнаружено».
+Формулировка «модели равны» здесь запрещена.
 """
 
 from __future__ import annotations
@@ -289,7 +289,9 @@ def render_results_report(
     if not versus_sb.empty:
         row = versus_sb.iloc[0]
         add(
-            f"Разница «моя лучшая модель минус `statsbomb_xg`» составляет "
+            f"Сравнивается основная модель проекта: логистическая регрессия "
+            f"с защитным контекстом. У неё log loss ниже, чем у случайного леса. "
+            f"Разница «логистическая минус `statsbomb_xg`» составляет "
             f"{row['delta_log_loss']:+.5f} log loss, интервал {_interval(row)}. "
         )
         if _includes_zero(row):
@@ -326,8 +328,8 @@ def render_results_report(
         "же строках. Skill это доля снятого log loss, BSS это Brier Skill Score.\n\n"
     )
     if league_skill is not None and not league_skill.empty:
-        # Строки случайного леса опущены: вывод по лигам строится на логистической
-        # регрессии, а полная таблица лежит в reports/tables/league_skill.csv.
+        # Строки случайного леса опущены: вывод по лигам строится на логистической.
+        # Полная таблица лежит в reports/tables/league_skill.csv.
         add(
             markdown_table(
                 league_skill[~league_skill["модель"].str.contains("Случайный лес")],
@@ -464,7 +466,24 @@ def _league_verdict(league_skill: pd.DataFrame) -> str:
         verdict += (
             " Разброс заметен, поэтому перенос модели между лигами нужно оговаривать отдельно."
         )
+    verdict += _context_gain_by_league(league_skill)
     return verdict
+
+
+def _context_gain_by_league(league_skill: pd.DataFrame) -> str:
+    """Прирост BSS от защитного контекста внутри каждой лиги."""
+    with_context = league_skill[league_skill["модель"] == "Логистическая + защитный контекст"]
+    without = league_skill[league_skill["модель"] == "Логистическая без контекста"]
+    if with_context.empty or without.empty:
+        return ""
+    gain = (with_context.set_index("лига")["BSS"] - without.set_index("лига")["BSS"]).sort_values()
+    grew = " Точечная оценка BSS выросла во всех четырёх лигах." if (gain > 0).all() else ""
+    return (
+        f"{grew} Слабее всего прирост в лиге {gain.index[0]} ({gain.iloc[0]:+.3f}), "
+        f"сильнее всего в {gain.index[-1]} ({gain.iloc[-1]:+.3f}). "
+        "Доверительные интервалы отдельно по лигам не считались, поэтому "
+        "устойчивость прироста внутри лиги не проверена."
+    )
 
 
 def _one_on_one_note(examples: pd.DataFrame) -> str:
@@ -474,7 +493,7 @@ def _one_on_one_note(examples: pd.DataFrame) -> str:
         return ""
     row = lowered.iloc[0]
     return (
-        f"Разбор одного случая. Удар с расстояния {row['shot_distance']:.1f} ярда "
+        f"Разбор одного случая. Удар с расстояния {row['shot_distance']:.1f} "
         "почти с нулевым углом к воротам получил без защитного контекста вероятность "
         f"{row['p_logistic_no_defense']:.3f} из-за флага `one_on_one`. Модель с "
         f"контекстом снизила прогноз до {row['p_logistic_defense']:.3f}, а "

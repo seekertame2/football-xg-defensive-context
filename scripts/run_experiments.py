@@ -4,8 +4,7 @@
 
 1. фиксируется разбиение train/validation/test по ``match_id``;
 2. обучается лестница M0–M4 с подбором гиперпараметров внутри train;
-3. проводится ablation по четырём уровням признаков на **одних и тех же
-   строках и одном разбиении**;
+3. проводится ablation по четырём уровням признаков;
 4. ``statsbomb_xg`` оценивается как внешний benchmark на тех же тестовых ударах;
 5. считаются метрики, калибровка, парный bootstrap по матчам и разрезы по лигам.
 
@@ -53,7 +52,8 @@ CONTEXT_SHOTS_PATH = PROCESSED_DATA_DIR / "context_eligible_shots.parquet"
 SPLIT_PATH = PROCESSED_DATA_DIR / "split.json"
 PREDICTIONS_PATH = PROCESSED_DATA_DIR / "test_predictions.parquet"
 
-#: Уровни ablation. Порядок важен: каждый следующий добавляет ровно одну группу.
+# Уровни ablation.
+# Порядок важен: каждый следующий добавляет ровно одну группу.
 ABLATION_LEVELS: tuple[tuple[str, str, str], ...] = (
     ("L1", "geometry", "геометрия удара"),
     ("L2", "geometry_shot", "+ характеристики удара"),
@@ -166,9 +166,9 @@ def flatten_result(result: dict[str, Any]) -> dict[str, Any]:
 def feature_importance(result: dict[str, Any]) -> pd.DataFrame:
     """Коэффициенты логистической регрессии или важности признаков дерева.
 
-    Названия колонок берутся после `ColumnTransformer`, поэтому one-hot
-    категории видны по отдельности. Значения интерпретируются с оговорками:
-    коллинеарные признаки делят вклад между собой.
+    Названия колонок берутся после `ColumnTransformer`.
+    Поэтому one-hot категории видны по отдельности.
+    Значения интерпретируются с оговорками: коллинеарные признаки делят вклад между собой.
     """
     model = result.get("estimator")
     if model is None:
@@ -205,10 +205,10 @@ def _league_skill_table(
 ) -> pd.DataFrame:
     """Относительные метрики внутри каждой лиги.
 
-    Сырой log loss зависит от базовой доли голов: лига с редкими голами
-    механически получает меньший log loss, и сравнивать лиги напрямую нельзя.
-    Поэтому для каждой лиги считается качество относительно `DummyClassifier`,
-    оценённого на тех же строках:
+    Сырой log loss зависит от базовой доли голов.
+    Лига с редкими голами механически получает меньший log loss.
+    Поэтому сравнивать лиги напрямую нельзя.
+    Вместо этого качество считается относительно `DummyClassifier` на тех же строках:
 
     * ``skill_log_loss`` — доля log loss, снятая моделью относительно Dummy;
     * ``BSS`` — Brier Skill Score, ``1 - Brier_модели / Brier_Dummy``.
@@ -249,8 +249,8 @@ def _isolation_audit(
 ) -> list[dict[str, Any]]:
     """Проверить экспериментальную изоляцию и вернуть протокол проверок.
 
-    Каждый пункт — проверяемое утверждение, а не декларация: значение ``passed``
-    вычисляется из фактических объектов эксперимента.
+    Каждый пункт это проверяемое утверждение, а не декларация.
+    Значение ``passed`` вычисляется из фактических объектов эксперимента.
     """
     train_matches = set(frames["train"]["match_id"])
     validation_matches = set(frames["validation"]["match_id"])
@@ -357,17 +357,27 @@ def main(argv: list[str] | None = None) -> int:
     logger.info("Загружено ударов: %d, матчей: %d", len(shots), shots["match_id"].nunique())
 
     if args.quick:
-        keep = sorted(shots["match_id"].unique())[:200]
+        # Матчи берутся из каждой лиги.
+        # Простое срезание первых по match_id дало бы одну лигу.
+        # Тогда quick-прогон не проверил бы ни балансировку разбиения, ни разрез по лигам.
+        keep: list[int] = []
+        for _, part in shots.groupby("competition_name", sort=True):
+            keep.extend(sorted(part["match_id"].unique())[:50])
         shots = shots[shots["match_id"].isin(keep)].reset_index(drop=True)
-        logger.info("Режим --quick: оставлено %d ударов", len(shots))
+        logger.info(
+            "Режим --quick: %d матчей из %d лиг, %d ударов",
+            len(keep),
+            shots["competition_name"].nunique(),
+            len(shots),
+        )
 
     # разбиение
     split_config = config["split"]
     split = make_grouped_split(
         shots,
         group_column=split_config.get("group_column", "match_id"),
-        target_column=split_config.get("stratify_column", "is_goal"),
-        stratify_column="competition_name",
+        target_column=split_config.get("target_column", "is_goal"),
+        stratify_column=split_config.get("stratify_column", "competition_name"),
         train_size=float(split_config["train_size"]),
         validation_size=float(split_config["validation_size"]),
         test_size=float(split_config["test_size"]),
@@ -617,9 +627,9 @@ def main(argv: list[str] | None = None) -> int:
     by_league = pd.concat(league_rows, ignore_index=True)
     by_league.to_csv(TABLES_DIR / "metrics_by_league.csv", index=False, encoding="utf-8")
 
-    # Относительные метрики: сырой log loss при разной базовой доле голов
-    # сравнивать между лигами нельзя. Базой служит DummyClassifier,
-    # обученный на train и оценённый внутри каждой лиги отдельно.
+    # Относительные метрики нужны потому, что сырой log loss зависит от доли голов.
+    # Сравнивать его между лигами напрямую нельзя.
+    # Базой служит DummyClassifier, обученный на train и оценённый внутри каждой лиги отдельно.
     logger.info("=== Относительные метрики по лигам (skill относительно Dummy) ===")
     dummy_probabilities = by_key["dummy@geometry"]["probabilities"]["test"]
     league_skill = _league_skill_table(
@@ -788,10 +798,12 @@ def _bootstrap_comparisons(
             probabilities("logistic@geometry_shot_flags_defensive_no_visible"),
             probabilities("logistic@geometry_shot_flags_defensive"),
         ),
+        # Сравнивается основная модель проекта: логистическая регрессия с защитным контекстом.
+        # У неё меньший log loss, чем у лучшей нелинейной модели.
         (
-            "Лучшая модель против statsbomb_xg",
+            "Логистическая с защитным контекстом против statsbomb_xg",
             sb_probabilities,
-            probabilities(f"{best_nonlinear}@geometry_shot_flags_defensive"),
+            probabilities("logistic@geometry_shot_flags_defensive"),
         ),
     ]
     return comparisons

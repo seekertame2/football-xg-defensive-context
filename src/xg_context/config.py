@@ -22,8 +22,9 @@ REPORTS_DIR: Path = PROJECT_ROOT / "reports"
 FIGURES_DIR: Path = REPORTS_DIR / "figures"
 TABLES_DIR: Path = REPORTS_DIR / "tables"
 
-# Система координат StatsBomb: поле 120 x 80 ярдов, атака всегда идёт в сторону
-# x = 120, ворота соперника лежат на линии x = 120 между y = 36 и y = 44.
+# Система координат StatsBomb: поле 120 x 80 единиц.
+# Атака всегда идёт в сторону x = 120.
+# Ворота соперника лежат на линии x = 120 между y = 36 и y = 44.
 PITCH_LENGTH: float = 120.0
 PITCH_WIDTH: float = 80.0
 
@@ -37,21 +38,22 @@ GOAL_CENTER: tuple[float, float] = (GOAL_LINE_X, GOAL_CENTER_Y)
 LEFT_POST: tuple[float, float] = (GOAL_LINE_X, GOAL_LEFT_POST_Y)
 RIGHT_POST: tuple[float, float] = (GOAL_LINE_X, GOAL_RIGHT_POST_Y)
 
-#: Радиусы (в ярдах) для подсчёта числа соперников вокруг бьющего.
+# Радиусы для подсчёта соперников вокруг бьющего, в единицах координат StatsBomb.
 OPPONENT_RADII: tuple[float, ...] = (1.0, 2.0, 3.0, 5.0)
 
-#: Допуск для численно неустойчивых геометрических случаев.
+# Допуск для численно неустойчивых геометрических случаев.
 GEOMETRY_EPS: float = 1e-9
 
 SHOT_EVENT_TYPE: str = "Shot"
 GOALKEEPER_POSITION_NAME: str = "Goalkeeper"
 
-#: Исход удара, который считается голом.
+# Исход удара, который считается голом.
 GOAL_OUTCOME_NAME: str = "Goal"
 
-#: Исходы удара в схеме StatsBomb. Написание сверено с данными: провайдер пишет
-#: "Saved Off Target" и "Saved to Post" со строчной "to". Исход вне этого набора
-#: поднимает ошибку и не превращается молча в не-гол.
+# Исходы удара в схеме StatsBomb.
+# Написание сверено с данными.
+# Провайдер пишет "Saved Off Target" и "Saved to Post" со строчной "to".
+# Исход вне этого набора поднимает ошибку и не превращается молча в не-гол.
 KNOWN_SHOT_OUTCOMES: frozenset[str] = frozenset(
     {
         "Goal",
@@ -65,19 +67,20 @@ KNOWN_SHOT_OUTCOMES: frozenset[str] = frozenset(
     }
 )
 
-#: Пенальти исключаются: это отдельный стандартизированный процесс.
+# Пенальти исключаются: это отдельный стандартизированный процесс.
 PENALTY_SHOT_TYPE: str = "Penalty"
 EXCLUDED_SHOT_TYPES: frozenset[str] = frozenset({PENALTY_SHOT_TYPE})
 
-#: Период серии пенальти в схеме StatsBomb.
+# Период серии пенальти в схеме StatsBomb.
 SHOOTOUT_PERIOD: int = 5
 
-# Списки колонок это контракт проекта. Пайплайн падает, если запрещённое поле
-# попало в матрицу признаков (см. `features.assert_no_forbidden_columns`).
+# Списки колонок это контракт проекта.
+# Пайплайн падает, если запрещённое поле попало в матрицу признаков (см.
+# `features.assert_no_forbidden_columns`).
 TARGET_COLUMN: str = "is_goal"
 
-#: Служебные поля. Хранятся в датасете для разбиения и аналитики,
-#: но никогда не попадают в матрицу признаков.
+# Служебные поля.
+# Хранятся в датасете для разбиения и аналитики, но никогда не попадают в матрицу признаков.
 ID_COLUMNS: tuple[str, ...] = (
     "shot_id",
     "match_id",
@@ -96,8 +99,8 @@ ID_COLUMNS: tuple[str, ...] = (
 
 BENCHMARK_COLUMNS: tuple[str, ...] = ("statsbomb_xg",)
 
-#: Поля, которые нельзя передавать в модель ни при каких условиях.
-#: Либо раскрывают исход удара, либо относятся к идентичности игрока/команды/лиги.
+# Поля, которые нельзя передавать в модель ни при каких условиях.
+# Либо раскрывают исход удара, либо относятся к идентичности игрока/команды/лиги.
 FORBIDDEN_FEATURE_COLUMNS: tuple[str, ...] = (
     # benchmark
     "statsbomb_xg",
@@ -121,8 +124,8 @@ FORBIDDEN_FEATURE_COLUMNS: tuple[str, ...] = (
     "goalkeeper_technique",
     "block",
     "save",
-    # идентичность игрока, команды и лиги: лига нужна для разбиения
-    # и аналитики, но признаком модели не является
+    # Идентичность игрока, команды и лиги.
+    # Лига нужна для разбиения и аналитики, но признаком модели не является.
     "player_id",
     "player_name",
     "team_id",
@@ -139,17 +142,18 @@ FORBIDDEN_FEATURE_COLUMNS: tuple[str, ...] = (
     "shot_id",
 )
 
-# Четыре группы признаков для ablation. Разделение принципиально: нужно
-# изолировать вклад самостоятельно рассчитанного пространственного контекста,
-# а не смешивать его с готовыми флагами StatsBomb.
+# Четыре группы признаков для ablation.
+# Разделение принципиально.
+# Нужно изолировать вклад самостоятельно рассчитанного контекста.
+# Смешивать его с готовыми флагами StatsBomb нельзя.
 
-#: Уровень 1: чистая геометрия удара.
+# Уровень 1: чистая геометрия удара.
 GEOMETRY_FEATURES: tuple[str, ...] = (
     "shot_distance",
     "shot_angle",
 )
 
-#: Уровень 2: чем, как и из какой ситуации бьют.
+# Уровень 2: чем, как и из какой ситуации бьют.
 SHOT_CHARACTERISTIC_FEATURES: tuple[str, ...] = (
     "body_part",
     "shot_technique",
@@ -158,16 +162,17 @@ SHOT_CHARACTERISTIC_FEATURES: tuple[str, ...] = (
     "is_first_time",
 )
 
-#: Уровень 3: готовые флаги StatsBomb. Это тоже контекст, но не наш расчёт,
-#: а разметка провайдера. Держим отдельно, иначе прирост от собственной
-#: геометрии защитников был бы завышен за счёт чужой работы.
+# Уровень 3: готовые флаги StatsBomb.
+# Это тоже контекст, но не наш расчёт, а разметка провайдера.
+# Держим отдельно.
+# Иначе прирост от собственной геометрии был бы завышен за счёт чужой работы.
 STATSBOMB_CONTEXT_FLAG_FEATURES: tuple[str, ...] = (
     "under_pressure",
     "one_on_one",
     "open_goal",
 )
 
-#: Уровень 4: пространственный контекст обороны, рассчитанный самостоятельно.
+# Уровень 4: пространственный контекст обороны, рассчитанный самостоятельно.
 DEFENSIVE_CONTEXT_FEATURES: tuple[str, ...] = (
     "nearest_opponent_distance",
     "opponents_within_1y",
@@ -192,13 +197,13 @@ SHOT_CONTEXT_FEATURES: tuple[str, ...] = (
     *STATSBOMB_CONTEXT_FLAG_FEATURES,
 )
 
-#: Категориальные признаки (остальные считаются числовыми).
+# Категориальные признаки (остальные считаются числовыми).
 CATEGORICAL_FEATURES: frozenset[str] = frozenset(
     {"body_part", "shot_technique", "shot_type", "play_pattern"}
 )
 
-#: Наборы признаков для лестницы моделей и ablation.
-#: Ключ — имя набора, значение — список колонок.
+# Наборы признаков для лестницы моделей и ablation.
+# Ключ — имя набора, значение — список колонок.
 FEATURE_SETS: dict[str, tuple[str, ...]] = {
     "geometry": GEOMETRY_FEATURES,
     "geometry_shot": (*GEOMETRY_FEATURES, *SHOT_CHARACTERISTIC_FEATURES),
@@ -214,8 +219,9 @@ FEATURE_SETS: dict[str, tuple[str, ...]] = {
         *DEFENSIVE_CONTEXT_FEATURES,
     ),
     "geometry_defensive": (*GEOMETRY_FEATURES, *DEFENSIVE_CONTEXT_FEATURES),
-    # Sensitivity test: L4 без `n_opponents_visible`. Признак отражает и плотность
-    # обороны, и границы поля зрения камеры, поэтому эффект проверяется без него.
+    # Sensitivity test: L4 без `n_opponents_visible`.
+    # Признак отражает и плотность обороны, и границы поля зрения камеры.
+    # Поэтому эффект проверяется ещё и без него.
     "geometry_shot_flags_defensive_no_visible": (
         *GEOMETRY_FEATURES,
         *SHOT_CHARACTERISTIC_FEATURES,
@@ -224,12 +230,13 @@ FEATURE_SETS: dict[str, tuple[str, ...]] = {
     ),
 }
 
-#: Признак, вокруг которого построен sensitivity test.
+# Признак, вокруг которого построен sensitivity test.
 AMBIGUOUS_VISIBILITY_FEATURE: str = "n_opponents_visible"
 
-#: Поля StatsBomb, которые есть в JSON только когда равны true. Отсутствие такого
-#: поля трактуется как false только после проверки на данных, что значение false
-#: не встречается. Проверка живёт в `dataset.py`.
+# Поля StatsBomb, которые есть в JSON только когда равны true.
+# Отсутствие такого поля трактуется как false только после проверки на данных.
+# Проверяется, что значение false в данных не встречается.
+# Проверка живёт в `dataset.py`.
 SPARSE_BOOLEAN_FIELDS: tuple[str, ...] = (
     "under_pressure",
     "one_on_one",
@@ -243,7 +250,8 @@ SPARSE_BOOLEAN_FIELDS: tuple[str, ...] = (
 
 RANDOM_SEED: int = 42
 
-#: Версия конфигурации построения датасета. Попадает в data_manifest.json.
+# Версия конфигурации построения датасета.
+# Попадает в data_manifest.json.
 DATASET_CONFIG_VERSION: str = "1.0.0"
 
 

@@ -1,37 +1,31 @@
 # Конфигурация эксперимента.
 #
-# Значения можно уточнять, но правила менять нельзя: группировка по match_id,
-# фиксированный test, log loss и калибровка как главные метрики,
-# ablation на одних и тех же строках.
+# Значения можно уточнять, но правила менять нельзя.
+# Группировка идёт по match_id, тест зафиксирован один раз.
+# Главные метрики это log loss и калибровка.
+# Ablation считается на одних и тех же строках.
 
 random_seed: 42
 
 split:
   # Разбиение только по группам матчей. Наивное случайное разбиение строк запрещено.
   group_column: match_id
-  stratify_column: is_goal
+  # Target нужен, чтобы выравнивать долю голов между частями.
+  target_column: is_goal
+  # По этой колонке выравниваются доли лиг.
+  stratify_column: competition_name
   train_size: 0.70
   validation_size: 0.15
   test_size: 0.15
-  # Тестовые shot_id фиксируются один раз и сохраняются на диск.
-  frozen_test_ids_path: data/processed/test_shot_ids.json
 
 cross_validation:
-  strategy: StratifiedGroupKFold
   n_splits: 5
-  shuffle: true
 
 metrics:
-  primary: log_loss
-  secondary:
-    - brier_score
-    - roc_auc
-    - average_precision
   calibration_bins: 10
 
 uncertainty:
   # Bootstrap на уровне матчей, а не отдельных ударов.
-  bootstrap_unit: match_id
   n_bootstrap: 1000
   confidence_level: 0.95
 
@@ -50,8 +44,3 @@ models:
     learning_rate: [0.03, 0.1]
     max_iter: [200, 400]
     max_leaf_nodes: [15, 31]
-
-# Дисбаланс классов: без SMOTE и oversampling.
-class_imbalance:
-  use_resampling: false
-  use_class_weight: false

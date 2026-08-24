@@ -1,8 +1,8 @@
 """Графики проекта с русскими подписями.
 
 Каждая функция отвечает на конкретный вопрос и подписывает источник данных.
-Единый стиль задаётся `apply_style()`, палитра подобрана так, чтобы линии
-различались и в цвете, и по типу штриха.
+Единый стиль задаётся `apply_style()`.
+Палитра подобрана так, чтобы линии различались и в цвете, и по типу штриха.
 """
 
 from __future__ import annotations
@@ -46,7 +46,7 @@ __all__ = [
 
 SOURCE_NOTE = "Источник: StatsBomb Open Data, сезон 2015/2016"
 
-#: Палитра: различима и по цвету, и по светлоте.
+# Палитра: различима и по цвету, и по светлоте.
 COLORS = {
     "geometry": "#4C72B0",
     "shot": "#DD8452",
@@ -94,11 +94,11 @@ def save_figure(fig: plt.Figure, path: str | Path, note: str = SOURCE_NOTE) -> P
 def _draw_attacking_third(ax: plt.Axes) -> None:
     """Нарисовать штрафную и ворота в системе координат StatsBomb."""
     ax.plot([PITCH_LENGTH, PITCH_LENGTH], [0, PITCH_WIDTH], color="#333333", lw=1.2)
-    # штрафная площадь 18 ярдов
+    # штрафная площадь: 18 единиц координат
     ax.plot([102, 102], [18, 62], color="#999999", lw=1.0)
     ax.plot([102, PITCH_LENGTH], [18, 18], color="#999999", lw=1.0)
     ax.plot([102, PITCH_LENGTH], [62, 62], color="#999999", lw=1.0)
-    # вратарская 6 ярдов
+    # вратарская: 6 единиц координат
     ax.plot([114, 114], [30, 50], color="#BBBBBB", lw=0.9)
     ax.plot([114, PITCH_LENGTH], [30, 30], color="#BBBBBB", lw=0.9)
     ax.plot([114, PITCH_LENGTH], [50, 50], color="#BBBBBB", lw=0.9)
@@ -124,8 +124,8 @@ def _draw_attacking_third(ax: plt.Axes) -> None:
 def plot_sample_overview(by_league: pd.DataFrame) -> plt.Figure:
     """Сколько матчей и ударов в каждой лиге и какова доля голов.
 
-    Вопрос: сбалансирована ли выборка и не различаются ли лиги по базовой
-    частоте голов настолько, что их нельзя считать одной популяцией?
+    Вопрос: сбалансирована ли выборка по лигам?
+    И не различаются ли лиги по базовой частоте голов слишком сильно?
     """
     fig, axes = plt.subplots(1, 3, figsize=(13, 4))
     order = by_league.sort_values("n_shots", ascending=False)
@@ -191,13 +191,12 @@ def plot_shot_map(shots: pd.DataFrame, bins: int = 24) -> plt.Figure:
 def plot_goal_rate_by_geometry(shots: pd.DataFrame, n_bins: int = 12) -> plt.Figure:
     """Как доля голов зависит от расстояния и угла.
 
-    Вопрос: достаточно ли линейной по этим признакам модели, или связь
-    существенно нелинейна?
+    Вопрос: достаточно ли линейной по этим признакам модели, или связь существенно нелинейна?
     """
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.2))
 
     for ax, column, label in (
-        (axes[0], "shot_distance", "Расстояние до центра ворот, ярды"),
+        (axes[0], "shot_distance", "Расстояние до центра ворот, единицы StatsBomb"),
         (axes[1], "shot_angle_deg", "Видимый угол ворот, градусы"),
     ):
         values = shots[column]
@@ -225,9 +224,8 @@ def plot_goal_rate_by_geometry(shots: pd.DataFrame, n_bins: int = 12) -> plt.Fig
 def plot_ablation(ablation: pd.DataFrame) -> plt.Figure:
     """Прирост качества по мере добавления групп признаков.
 
-    Вопрос проекта: какую дополнительную ценность даёт САМОСТОЯТЕЛЬНО
-    рассчитанный защитный контекст сверх геометрии, характеристик удара
-    и готовых флагов StatsBomb?
+    Вопрос проекта: какую ценность даёт самостоятельно рассчитанный контекст?
+    Сравнение идёт сверх геометрии, характеристик удара и готовых флагов StatsBomb.
     """
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.6))
     levels = ["L1", "L2", "L3", "L4"]
@@ -347,8 +345,8 @@ def plot_xg_surface(
 ) -> plt.Figure:
     """Карта предсказанного xG по полю для контролируемых сценариев.
 
-    Вопрос: как модель меняет прогноз при одном и том же положении мяча,
-    но разной плотности обороны?
+    Вопрос: как модель меняет прогноз при одном и том же положении мяча?
+    Плотность обороны при этом разная.
 
     Parameters
     ----------
@@ -446,8 +444,8 @@ def plot_freeze_frame_examples(examples: Sequence[Mapping[str, Any]]) -> plt.Fig
             edgecolor="white",
             linewidth=0.8,
         )
-        # Границы подгоняются под сюжет: иначе удар с фланга или из-за штрафной
-        # оказывается за рамкой, и рисунок вводит в заблуждение.
+        # Границы подгоняются под сюжет.
+        # Иначе удар с фланга или из-за штрафной оказывается за рамкой.
         points_x = np.concatenate([[shot_x], opponents_x, [example.get("keeper_x", np.nan)]])
         points_y = np.concatenate([[shot_y], opponents_y, [example.get("keeper_y", np.nan)]])
         points_x = points_x[np.isfinite(points_x)]
@@ -514,8 +512,8 @@ def plot_error_analysis(subgroups: pd.DataFrame) -> plt.Figure:
 def plot_sensitivity(bootstrap: pd.DataFrame) -> plt.Figure:
     """Устойчив ли главный эффект без спорного признака `n_opponents_visible`.
 
-    Вопрос: не держится ли прирост от защитного контекста на признаке, который
-    смешивает плотность обороны с границами поля зрения камеры?
+    Вопрос: не держится ли прирост на одном спорном признаке?
+    Он смешивает плотность обороны с границами поля зрения камеры.
     """
     wanted = bootstrap[
         bootstrap["сравнение"].str.contains("защитный контекст|Вучёт", regex=True)
@@ -563,8 +561,9 @@ def plot_sensitivity(bootstrap: pd.DataFrame) -> plt.Figure:
 def plot_league_skill(league_skill: pd.DataFrame) -> plt.Figure:
     """Относительное качество внутри каждой лиги.
 
-    Вопрос: одинаково ли модель работает в четырёх лигах, если убрать эффект
-    разной базовой доли голов? Сырой log loss для этого не годится.
+    Вопрос: одинаково ли модель работает в четырёх лигах?
+    Эффект разной базовой доли голов при этом убран.
+    Сырой log loss для этого не годится.
     """
     frame = league_skill.copy()
     order = sorted(frame["лига"].unique())
