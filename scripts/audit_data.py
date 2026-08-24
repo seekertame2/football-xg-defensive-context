@@ -52,7 +52,7 @@ from xg_context.data import (
     events_path,
     fetch_source_inventory,
 )
-from xg_context.reporting import markdown_table
+from xg_context.reporting import markdown_table, plain_text
 
 logger = logging.getLogger("audit_data")
 
@@ -115,7 +115,7 @@ def rank_candidates(context_by_season: pd.DataFrame) -> pd.DataFrame:
 
     1. доля ударов с защитным контекстом не ниже `MIN_CONTEXT_SHARE`;
     2. доля ударов с распознанным вратарём не ниже `MIN_GK_SHARE`;
-    3. сезон не «обрезанный»: не меньше `MIN_MATCHES` матчей с событиями;
+    3. сезон не "обрезанный": не меньше `MIN_MATCHES` матчей с событиями;
     4. ожидаемый объём не меньше `MIN_ESTIMATED_SHOTS` ударов.
 
     Кандидаты, прошедшие все фильтры, сортируются по ожидаемому числу ударов:
@@ -140,7 +140,7 @@ def rank_candidates(context_by_season: pd.DataFrame) -> pd.DataFrame:
 def build_homogeneous_blocks(ranked: pd.DataFrame) -> pd.DataFrame:
     """Сгруппировать прошедших фильтры кандидатов в однородные блоки.
 
-    Блок это пара «пол соревнования плюс сезон», например четыре топ-лиги Европы сезона 2015/2016.
+    Блок это пара "пол соревнования плюс сезон", например четыре топ-лиги Европы сезона 2015/2016.
     Внутри блока данные собраны в одну эпоху и один тип футбола.
     Поэтому объединение сезонов не смешивает разные контексты.
 
@@ -176,7 +176,7 @@ def build_homogeneous_blocks(ranked: pd.DataFrame) -> pd.DataFrame:
 
 
 def select_recommended(ranked: pd.DataFrame, blocks: pd.DataFrame) -> pd.DataFrame:
-    """Вернуть строки рекомендуемой выборки — лучший однородный блок.
+    """Вернуть строки рекомендуемой выборки - лучший однородный блок.
 
     Если лучший блок не помещается в бюджет, из него берутся самые крупные сезоны.
     Отбор идёт жадно, пока бюджет не исчерпан.
@@ -210,8 +210,8 @@ def _fmt_share(value: float) -> str:
 
 
 def _fmt_int(value: int | float) -> str:
-    """Целое число с неразрывным пробелом между разрядами."""
-    return f"{int(value):,}".replace(",", "\u202f")
+    """Целое число с пробелом между разрядами."""
+    return f"{int(value):,}".replace(",", " ")
 
 
 def _plural(count: int, one: str, few: str, many: str) -> str:
@@ -244,7 +244,7 @@ def _md_table(
     """Отрендерить DataFrame в markdown-таблицу с русскими заголовками.
 
     Дробные значения с нулевой дробной частью печатаются как целые.
-    Иначе таблица пестрит бессмысленными «380.000».
+    Иначе таблица пестрит бессмысленными "380.000".
     Через ``formats`` можно задать формат отдельной колонки по её исходному имени.
     """
     if frame.empty:
@@ -471,7 +471,7 @@ def render_selection_report(context: dict[str, Any]) -> str:
         "воспроизвести командой `python scripts/audit_data.py` без флага "
         "`--selection`.\n"
     )
-    return "".join(parts)
+    return plain_text("".join(parts))
 
 
 def _pct(value: float) -> str:
@@ -479,7 +479,7 @@ def _pct(value: float) -> str:
 
 
 def _selection_bias_verdict(n_all: int, n_context: int) -> str:
-    """Вывод о смещении выборки — строго по фактическому числу исключённых строк."""
+    """Вывод о смещении выборки - строго по фактическому числу исключённых строк."""
     dropped = n_all - n_context
     share = dropped / n_all if n_all else 0.0
     if dropped == 0:
@@ -772,7 +772,7 @@ def render_report(context: dict[str, Any]) -> str:
         "`reports/tables/audit_selection_bias.csv`. "
         "Разобранные удары выборки аудита: `data/interim/audit_shots_sample.parquet`.\n"
     )
-    return "".join(parts)
+    return plain_text("".join(parts))
 
 
 def _run_selection_audit(config) -> int:

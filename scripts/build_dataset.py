@@ -107,7 +107,7 @@ def build_full_sample_audit(
     schema: SchemaReport,
     filter_log: FilterLog,
 ) -> dict[str, Any]:
-    """Проверка покрытия по ПОЛНОЙ выборке — заменяет оценку по 3 матчам на сезон."""
+    """Проверка покрытия по ПОЛНОЙ выборке - заменяет оценку по 3 матчам на сезон."""
     n_all = len(all_eligible)
     by_league = (
         all_eligible.groupby("competition_name")

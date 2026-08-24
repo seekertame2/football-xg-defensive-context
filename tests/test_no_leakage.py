@@ -41,7 +41,7 @@ class TestFeatureListContract:
         assert TARGET_COLUMN in FORBIDDEN_FEATURE_COLUMNS
 
     def test_statsbomb_xg_is_benchmark_and_forbidden_as_feature(self) -> None:
-        """statsbomb_xg — только внешний benchmark (раздел 9.4)."""
+        """statsbomb_xg - только внешний benchmark (раздел 9.4)."""
         assert "statsbomb_xg" in BENCHMARK_COLUMNS
         assert "statsbomb_xg" in FORBIDDEN_FEATURE_COLUMNS
         assert "statsbomb_xg" not in ALL_FEATURES
@@ -66,7 +66,7 @@ class TestFeatureListContract:
 class TestForbiddenColumnGuard:
     def test_clean_feature_matrix_passes(self) -> None:
         frame = pd.DataFrame(columns=list(ALL_FEATURES))
-        # Функция ничего не возвращает: успех — отсутствие исключения.
+        # Функция ничего не возвращает: успех - отсутствие исключения.
         assert_no_forbidden_columns(frame)
 
     @pytest.mark.parametrize(
@@ -177,7 +177,7 @@ class TestPreprocessorRejectsLeakage:
 
 
 class TestTransformedMatrixIsClean:
-    """После ColumnTransformer имена меняются — проверяем и их."""
+    """После ColumnTransformer имена меняются - проверяем и их."""
 
     def test_transformed_feature_names_contain_no_forbidden_fields(self) -> None:
         features = list(FEATURE_SETS["geometry_shot_flags_defensive"])

@@ -1,7 +1,7 @@
 """Тесты пространственных признаков защитного контекста.
 
 Все проверки идут на синтетической геометрии с заранее известным ответом.
-Отдельное внимание уделено правилу «не выдумывать координаты».
+Отдельное внимание уделено правилу "не выдумывать координаты".
 Если вратарь или соперники не попали в кадр, признак равен ``NaN`` или нулю.
 Правдоподобное число вместо них недопустимо.
 """
@@ -26,7 +26,7 @@ SHOT = (108.0, 40.0)
 
 
 class TestShotCone:
-    """Конус удара — треугольник «бьющий — левая штанга — правая штанга»."""
+    """Конус удара - треугольник "бьющий - левая штанга - правая штанга"."""
 
     def test_defender_on_the_shot_line_is_inside(self) -> None:
         assert point_in_shot_cone(*SHOT, [114.0], [40.0])[0]
@@ -61,7 +61,7 @@ class TestShotCone:
         assert point_in_shot_cone(*SHOT, [], []).size == 0
 
     def test_degenerate_shot_from_goal_line_has_empty_cone(self) -> None:
-        """С самой линии ворот треугольник схлопывается — конус пуст."""
+        """С самой линии ворот треугольник схлопывается - конус пуст."""
         assert not point_in_shot_cone(GOAL_LINE_X, GOAL_CENTER_Y, [119.0], [40.0])[0]
 
     def test_nan_coordinates_are_not_counted_as_inside(self) -> None:
@@ -77,7 +77,7 @@ class TestNearestOpponent:
         assert value == pytest.approx(1.0)
 
     def test_no_opponents_gives_nan_not_a_large_number(self) -> None:
-        """Отсутствие соперников в кадре — неизвестность, а не «очень далеко»."""
+        """Отсутствие соперников в кадре - неизвестность, а не "очень далеко"."""
         assert np.isnan(nearest_opponent_distance(*SHOT, [], []))
 
     def test_only_invalid_coordinates_gives_nan(self) -> None:
@@ -162,7 +162,7 @@ class TestDefensiveContext:
         assert context["n_opponents_visible"] == 1
 
     def test_counters_never_exceed_visible_opponents(self) -> None:
-        """Число видимых соперников — верхняя граница для всех счётчиков."""
+        """Число видимых соперников - верхняя граница для всех счётчиков."""
         context = defensive_context(
             100.0, 30.0, [105.0, 110.0, 115.0, 118.0], [32.0, 35.0, 38.0, 40.0], 119.0, 40.0
         )

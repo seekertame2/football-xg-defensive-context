@@ -203,7 +203,7 @@ CATEGORICAL_FEATURES: frozenset[str] = frozenset(
 )
 
 # Наборы признаков для лестницы моделей и ablation.
-# Ключ — имя набора, значение — список колонок.
+# Ключ - имя набора, значение - список колонок.
 FEATURE_SETS: dict[str, tuple[str, ...]] = {
     "geometry": GEOMETRY_FEATURES,
     "geometry_shot": (*GEOMETRY_FEATURES, *SHOT_CHARACTERISTIC_FEATURES),

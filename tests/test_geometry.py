@@ -37,7 +37,6 @@ class TestShotDistance:
         assert shot_distance(GOAL_LINE_X, GOAL_CENTER_Y) == pytest.approx(0.0)
 
     def test_known_diagonal_distance(self) -> None:
-        # (117, 36) -> катеты 3 и 4 -> гипотенуза 5
         assert shot_distance(117.0, 36.0) == pytest.approx(5.0)
 
     def test_distance_is_symmetric_across_the_pitch(self) -> None:
@@ -88,7 +87,7 @@ class TestGoalMouthAngle:
         assert central > wide
 
     def test_on_goal_line_between_posts_is_the_limit(self) -> None:
-        """Точка на линии ворот между штангами — предельный случай, угол равен pi."""
+        """Точка на линии ворот между штангами - предельный случай, угол равен pi."""
         assert goal_mouth_angle(GOAL_LINE_X, GOAL_CENTER_Y) == pytest.approx(np.pi)
 
     def test_on_goal_line_outside_posts_is_zero(self) -> None:
@@ -160,7 +159,7 @@ class TestGoalkeeperGeometry:
         assert result["distance_to_shot_goal_line"] == pytest.approx(4.0)
 
     def test_keeper_behind_the_shooter_projects_onto_segment_end(self) -> None:
-        """Проекция ограничена отрезком «бьющий — центр ворот»."""
+        """Проекция ограничена отрезком "бьющий - центр ворот"."""
         result = goalkeeper_geometry(108.0, 40.0, 100.0, 40.0)
         assert result["distance_to_shot"] == pytest.approx(8.0)
         assert result["distance_to_shot_goal_line"] == pytest.approx(8.0)
@@ -177,7 +176,7 @@ class TestGoalkeeperGeometry:
         assert np.isnan(result["distance_to_shot_goal_line"])
 
     def test_shot_from_goal_centre_has_undefined_shot_line(self) -> None:
-        """Нулевой отрезок «удар — центр ворот» не должен давать деление на ноль."""
+        """Нулевой отрезок "удар - центр ворот" не должен давать деление на ноль."""
         result = goalkeeper_geometry(GOAL_LINE_X, GOAL_CENTER_Y, 119.0, 40.0)
         assert np.isnan(result["distance_to_shot_goal_line"])
 

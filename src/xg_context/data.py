@@ -172,7 +172,7 @@ class StatsBombDownloader:
     # удобные обёртки
 
     def load_competitions(self) -> list[dict[str, Any]]:
-        """Прочитать `competitions.json` — перечень соревнований и сезонов."""
+        """Прочитать `competitions.json` - перечень соревнований и сезонов."""
         return self.load_json(COMPETITIONS_PATH)
 
     def load_matches(self, competition_id: int, season_id: int) -> list[dict[str, Any]]:

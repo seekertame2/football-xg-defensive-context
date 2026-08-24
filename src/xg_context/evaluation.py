@@ -98,8 +98,8 @@ def calibration_table(
     Parameters
     ----------
     strategy:
-        ``quantile`` — равное число ударов в бине (устойчиво при скошенном xG);
-        ``uniform`` — равные интервалы вероятности.
+        ``quantile`` - равное число ударов в бине (устойчиво при скошенном xG);
+        ``uniform`` - равные интервалы вероятности.
     """
     y_true = np.asarray(y_true, dtype=int)
     probabilities = _clip(y_prob)
@@ -133,7 +133,7 @@ def calibration_table(
     table = pd.DataFrame(rows)
     if not table.empty:
         table["gap"] = table["observed_rate"] - table["mean_predicted"]
-        # ECE со взвешиванием по размеру бина — явно определённая величина.
+        # ECE со взвешиванием по размеру бина - явно определённая величина.
         table.attrs["ece"] = float((table["n"] / table["n"].sum() * table["gap"].abs()).sum())
     return table
 
@@ -156,7 +156,7 @@ def metrics_by_group(
     *,
     group_name: str = "группа",
 ) -> pd.DataFrame:
-    """Метрики отдельно по каждой группе (у нас — по лигам)."""
+    """Метрики отдельно по каждой группе (у нас - по лигам)."""
     frame = pd.DataFrame(
         {
             "y": np.asarray(y_true, dtype=int),
@@ -191,7 +191,7 @@ def paired_bootstrap_by_match(
     Остаётся именно эффект признаков.
 
     Отрицательная разница означает, что кандидат лучше базовой модели:
-    и log loss, и Brier score — метрики «чем меньше, тем лучше».
+    и log loss, и Brier score - метрики "чем меньше, тем лучше".
     """
     y_true = np.asarray(y_true, dtype=int)
     baseline = _clip(prob_baseline)

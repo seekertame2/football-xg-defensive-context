@@ -2,8 +2,8 @@
 
 Весь текст строится из чисел, полученных пайплайном.
 Формулировки о значимости выбирает код по фактическим доверительным интервалам, а не автор текста.
-Если интервал разницы включает ноль, пишем «различия не обнаружено».
-Формулировка «модели равны» здесь запрещена.
+Если интервал разницы включает ноль, пишем "различия не обнаружено".
+Формулировка "модели равны" здесь запрещена.
 """
 
 from __future__ import annotations
@@ -12,9 +12,31 @@ from typing import Any
 
 import pandas as pd
 
-__all__ = ["markdown_table", "render_results_report"]
+__all__ = ["markdown_table", "plain_text", "render_results_report"]
 
-THIN_SPACE = " "
+THIN_SPACE = " "
+
+# Отчёты читают и правят руками, поэтому в них только клавиатурные символы.
+# Часть подписей приходит из CSV, где типографские знаки остаются как есть.
+PLAIN_REPLACEMENTS = {
+    "→": "->",
+    "—": "-",
+    "–": "-",
+    "−": "-",
+    "«": '"',
+    "»": '"',
+    "…": "...",
+    " ": " ",
+    " ": " ",
+    "°": " градусов",
+}
+
+
+def plain_text(text: str) -> str:
+    """Заменить типографские символы на клавиатурные."""
+    for old, new in PLAIN_REPLACEMENTS.items():
+        text = text.replace(old, new)
+    return text
 
 
 def _fmt_int(value: float | int) -> str:
@@ -52,7 +74,7 @@ def markdown_table(
             else:
                 cells.append(str(value))
         lines.append("| " + " | ".join(cells) + " |")
-    return "\n".join(lines) + "\n"
+    return plain_text("\n".join(lines) + "\n")
 
 
 def _interval(row: pd.Series, metric: str = "log_loss") -> str:
@@ -65,10 +87,10 @@ def _includes_zero(row: pd.Series, metric: str = "log_loss") -> bool:
 
 BOOTSTRAP_COLUMNS = {
     "сравнение": "Сравнение",
-    "delta_log_loss": "Δ log loss",
+    "delta_log_loss": "Разница log loss",
     "delta_log_loss_ci_low": "CI низ",
     "delta_log_loss_ci_high": "CI верх",
-    "delta_brier": "Δ Brier",
+    "delta_brier": "Разница Brier",
     "delta_brier_ci_low": "CI низ",
     "delta_brier_ci_high": "CI верх",
 }
@@ -190,7 +212,7 @@ def render_results_report(
                 "test_log_loss": "Test log loss",
                 "test_brier": "Brier",
                 "test_roc_auc": "ROC-AUC",
-                "Δ_log_loss_шаг": "Δ на шаге",
+                "Δ_log_loss_шаг": "Разница на шаге",
             },
             {"Δ_log_loss_шаг": "{:+.5f}"},
         )
@@ -246,9 +268,9 @@ def render_results_report(
                 {
                     "модель": "Модель",
                     "L3 без защитного контекста": "L3 (без контекста)",
-                    "L4 без n_opponents_visible": "L4− (без visible)",
+                    "L4 без n_opponents_visible": "L4 без visible",
                     "L4 полный": "L4 (полный)",
-                    "brier_L4_без_visible": "Brier L4−",
+                    "brier_L4_без_visible": "Brier L4 без visible",
                     "brier_L4": "Brier L4",
                 },
             )
@@ -281,8 +303,8 @@ def render_results_report(
         else:
             add("Интервалы не включают ноль, вклад устойчив.\n")
         add(
-            "\nЧитать этот признак как «плотность обороны» всё равно нельзя: он "
-            "кодирует ещё и то, сколько игроков попало в кадр.\n"
+            "\nЧитать этот признак как плотность обороны всё равно нельзя. "
+            "Он кодирует ещё и то, сколько игроков попало в кадр.\n"
         )
 
     add("\n## 6. Сравнение со `statsbomb_xg`\n\n")
@@ -291,7 +313,7 @@ def render_results_report(
         add(
             f"Сравнивается основная модель проекта: логистическая регрессия "
             f"с защитным контекстом. У неё log loss ниже, чем у случайного леса. "
-            f"Разница «логистическая минус `statsbomb_xg`» составляет "
+            f"Разница между логистической и `statsbomb_xg` составляет "
             f"{row['delta_log_loss']:+.5f} log loss, интервал {_interval(row)}. "
         )
         if _includes_zero(row):
@@ -436,7 +458,7 @@ def render_results_report(
     for item in _limitations():
         add(f"- {item}\n")
 
-    return "".join(parts)
+    return plain_text("".join(parts))
 
 
 def _league_verdict(league_skill: pd.DataFrame) -> str:
@@ -507,8 +529,8 @@ def _one_on_one_note(examples: pd.DataFrame) -> str:
 def _limitations() -> list[str]:
     return [
         "`shot.freeze_frame` показывает только игроков в кадре. В среднем видно "
-        "около 7.5 соперника вместо десяти, поэтому все счётчики означают «сколько "
-        "видно».",
+        "около 7.5 соперника вместо десяти, поэтому все счётчики говорят о том, "
+        "сколько соперников видно, а не сколько их было на поле.",
         "Работа отвечает на вопрос о качестве прогноза, а не о причинах.",
         "Отсутствие эффекта у флагов StatsBomb не доказывает, что вклад принадлежит "
         "только моим признакам.",

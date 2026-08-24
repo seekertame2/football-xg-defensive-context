@@ -1,34 +1,24 @@
 # Конфигурация источника данных и аудита.
-#
-# Ревизия StatsBomb Open Data зафиксирована commit SHA. Источник обновляется,
-# и без фиксации результаты перестали бы воспроизводиться.
 
 source:
   repo: hudl/open-data
-  # Ревизия зафиксирована 2026-08-23. Не менять без пересборки аудита и манифеста.
+  # Ревизия StatsBomb Open Data зафиксирована commit SHA.
+  # Источник обновляется, и без фиксации результаты перестали бы воспроизводиться.
   commit_sha: b0bc9f22dd77c206ddedc1d742893b3bbe64baec
   raw_base_url: https://raw.githubusercontent.com
   api_base_url: https://api.github.com
 
-# Параметры выборочного аудита событий.
 audit:
-  # Матчей на каждый competition-season. Полная загрузка событий — 12.8 ГБ,
-  # поэтому доступность freeze_frame оценивается по стратифицированной выборке.
   matches_per_season: 3
-  # Жёсткий предохранитель на число скачиваемых файлов событий.
   max_event_files: 260
   sample_seed: 42
-  # Сколько матчей с 360 скачать для проверки схемы отдельного источника.
   three_sixty_probe_matches: 2
 
 download_workers: 8
 request_timeout: 120
 max_retries: 3
 
-# Итоговая выборка основного исследования.
-# Заполняется человеком после того, как прочитан reports/data_audit.md.
 selection:
-  # Целевая популяция: ведущие европейские мужские лиги сезона 2015/2016.
   approved: true
   competition_seasons:
     - { competition_id: 11, season_id: 27 }  # La Liga 2015/2016

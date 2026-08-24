@@ -3,7 +3,7 @@
 Порядок работы:
 
 1. фиксируется разбиение train/validation/test по ``match_id``;
-2. обучается лестница M0–M4 с подбором гиперпараметров внутри train;
+2. обучается лестница M0-M4 с подбором гиперпараметров внутри train;
 3. проводится ablation по четырём уровням признаков;
 4. ``statsbomb_xg`` оценивается как внешний benchmark на тех же тестовых ударах;
 5. считаются метрики, калибровка, парный bootstrap по матчам и разрезы по лигам.
@@ -210,8 +210,8 @@ def _league_skill_table(
     Поэтому сравнивать лиги напрямую нельзя.
     Вместо этого качество считается относительно `DummyClassifier` на тех же строках:
 
-    * ``skill_log_loss`` — доля log loss, снятая моделью относительно Dummy;
-    * ``BSS`` — Brier Skill Score, ``1 - Brier_модели / Brier_Dummy``.
+    * ``skill_log_loss`` - доля log loss, снятая моделью относительно Dummy;
+    * ``BSS`` - Brier Skill Score, ``1 - Brier_модели / Brier_Dummy``.
 
     Обе величины безразмерны и сопоставимы между лигами.
     """
@@ -735,7 +735,7 @@ def main(argv: list[str] | None = None) -> int:
 
 
 def _build_grids(config: dict[str, Any], *, quick: bool) -> dict[str, dict[str, list[Any]]]:
-    """Сетки гиперпараметров из конфигурации; в quick-режиме — минимальные."""
+    """Сетки гиперпараметров из конфигурации; в quick-режиме - минимальные."""
     models = config.get("models", {})
     if quick:
         return {

@@ -144,7 +144,7 @@ class TestDownloadEstimate:
         assert estimate["total_mb"] == pytest.approx(5.0)
 
     def test_three_sixty_adds_volume(self, inventory: SourceInventory) -> None:
-        """Файлы 360 существенно дороже по объёму — оценка обязана это показывать."""
+        """Файлы 360 существенно дороже по объёму - оценка обязана это показывать."""
         without = estimate_download_size(inventory, [8650])
         with_360 = estimate_download_size(inventory, [8650], include_three_sixty=True)
         assert with_360["total_bytes"] > without["total_bytes"]

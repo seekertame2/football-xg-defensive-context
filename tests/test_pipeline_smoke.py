@@ -50,7 +50,7 @@ def _shot_event(rng: np.random.Generator, index: int) -> dict[str, Any]:
     shot_x = float(rng.uniform(84.0, 119.0))
     shot_y = float(rng.uniform(18.0, 62.0))
 
-    # Вероятность гола растёт с близостью — чтобы модель могла хоть что-то выучить.
+    # Вероятность гола растёт с близостью - чтобы модель могла хоть что-то выучить.
     distance = float(np.hypot(120.0 - shot_x, 40.0 - shot_y))
     probability = float(np.clip(0.75 - 0.035 * distance, 0.02, 0.6))
     outcome = "Goal" if rng.random() < probability else str(rng.choice(OUTCOMES[1:]))
