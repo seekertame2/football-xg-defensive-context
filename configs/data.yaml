@@ -1,0 +1,29 @@
+# Конфигурация источника данных и аудита.
+
+source:
+  repo: hudl/open-data
+  # Ревизия StatsBomb Open Data зафиксирована commit SHA.
+  # Источник обновляется, и без фиксации результаты перестали бы воспроизводиться.
+  commit_sha: b0bc9f22dd77c206ddedc1d742893b3bbe64baec
+  raw_base_url: https://raw.githubusercontent.com
+  api_base_url: https://api.github.com
+
+audit:
+  matches_per_season: 3
+  max_event_files: 260
+  sample_seed: 42
+  three_sixty_probe_matches: 2
+
+download_workers: 8
+request_timeout: 120
+max_retries: 3
+
+selection:
+  approved: true
+  competition_seasons:
+    - { competition_id: 11, season_id: 27 }  # La Liga 2015/2016
+    - { competition_id: 2, season_id: 27 }   # Premier League 2015/2016
+    - { competition_id: 12, season_id: 27 }  # Serie A 2015/2016
+    - { competition_id: 7, season_id: 27 }   # Ligue 1 2015/2016
+  # StatsBomb 360 не используется: ни один матч выборки не имеет файла 360.
+  include_three_sixty: false

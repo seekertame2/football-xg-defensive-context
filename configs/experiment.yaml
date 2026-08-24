@@ -1,0 +1,38 @@
+# Конфигурация эксперимента.
+
+random_seed: 42
+
+split:
+  # Разбиение идёт по матчам.
+  group_column: match_id
+  target_column: is_goal
+  stratify_column: competition_name
+  train_size: 0.70
+  validation_size: 0.15
+  test_size: 0.15
+
+cross_validation:
+  n_splits: 5
+
+metrics:
+  calibration_bins: 10
+
+uncertainty:
+  # Bootstrap идёт по матчам.
+  n_bootstrap: 1000
+  confidence_level: 0.95
+
+models:
+  logistic_regression:
+    C: [0.01, 0.1, 1.0, 10.0]
+  decision_tree:
+    max_depth: [3, 5, 8, 12]
+    min_samples_leaf: [20, 50, 200]
+  random_forest:
+    n_estimators: [300]
+    max_depth: [8, 14, null]
+    min_samples_leaf: [5, 20, 50]
+  gradient_boosting:
+    learning_rate: [0.03, 0.1]
+    max_iter: [200, 400]
+    max_leaf_nodes: [15, 31]

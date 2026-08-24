@@ -1,0 +1,9 @@
+gender,season_name,n_competitions,n_matches,estimated_total_shots,events_mb,min_context_share,min_gk_share,n_matches_with_360,competitions,events_gb,fits_budget,meets_target
+male,2015/2016,4,1517,35654,4568.7,1.0,1.0,0,"La Liga, Ligue 1, Premier League, Serie A",4.5687,True,True
+female,2023/2024,4,634,19299,1935.4,1.0,1.0,0,"FA Women's Super League, Frauen Bundesliga, Liga F, Serie A Women",1.9354,True,True
+female,2020/2021,1,131,3493,383.6,1.0,1.0,0,FA Women's Super League,0.3836,True,False
+female,2023,1,137,3471,402.1,1.0,1.0,0,NWSL,0.4021,True,False
+female,2018/2019,1,107,3210,308.0,1.0,1.0,0,FA Women's Super League,0.308,True,False
+male,2021/2022,1,115,2760,300.4,1.0,1.0,0,Indian Super league,0.3004,True,False
+female,2019/2020,1,87,2581,253.8,1.0,1.0,0,FA Women's Super League,0.2538,True,False
+male,2018,1,64,1643,192.4,1.0,1.0,0,FIFA World Cup,0.19240000000000002,True,False

@@ -1,0 +1,81 @@
+competition_id,season_id,n_matches_sampled,n_shots,goal_rate,share_with_freeze_frame,share_with_context,share_with_gk,median_opponents_in_frame,share_with_statsbomb_xg,competition_name,season_name,country_name,gender,n_matches,n_matches_with_events,n_matches_with_360,events_mb,shots_per_match,estimated_total_shots,passes_context,passes_gk,passes_matches,passes_volume,is_candidate
+11,27,3,74,0.08108108108108109,1.0,1.0,1.0,9.0,1.0,La Liga,2015/2016,Spain,male,380,380,0,1121.6,24.666666666666668,9373,True,True,True,True,True
+2,27,3,72,0.1111111111111111,1.0,1.0,1.0,8.0,1.0,Premier League,2015/2016,England,male,380,380,0,1129.3,24.0,9120,True,True,True,True,True
+12,27,3,71,0.11267605633802817,1.0,1.0,1.0,9.0,1.0,Serie A,2015/2016,Italy,male,380,380,0,1156.3,23.666666666666668,8993,True,True,True,True,True
+7,27,3,65,0.09230769230769231,1.0,1.0,1.0,9.0,1.0,Ligue 1,2015/2016,France,male,377,377,0,1161.5,21.666666666666668,8168,True,True,True,True,True
+182,281,3,94,0.1595744680851064,1.0,1.0,1.0,10.0,1.0,Liga F,2023/2024,Spain,female,240,240,0,733.0,31.333333333333332,7520,True,True,True,True,True
+135,281,3,96,0.125,1.0,1.0,1.0,9.0,1.0,Frauen Bundesliga,2023/2024,Germany,female,132,132,0,398.4,32.0,4224,True,True,True,True,True
+37,281,3,88,0.045454545454545456,1.0,1.0,1.0,9.0,1.0,FA Women's Super League,2023/2024,England,female,132,132,0,429.1,29.333333333333332,3872,True,True,True,True,True
+131,281,3,85,0.15294117647058825,1.0,1.0,1.0,10.0,1.0,Serie A Women,2023/2024,Italy,female,130,130,0,374.9,28.333333333333332,3683,True,True,True,True,True
+37,90,3,80,0.125,1.0,1.0,1.0,9.0,1.0,FA Women's Super League,2020/2021,England,female,131,131,0,383.6,26.666666666666668,3493,True,True,True,True,True
+49,107,3,76,0.10526315789473684,1.0,1.0,1.0,9.0,1.0,NWSL,2023,United States of America,female,137,137,0,402.1,25.333333333333332,3471,True,True,True,True,True
+37,4,3,90,0.1,1.0,1.0,1.0,10.0,1.0,FA Women's Super League,2018/2019,England,female,107,107,0,308.0,30.0,3210,True,True,True,True,True
+1238,108,3,72,0.125,1.0,1.0,1.0,9.0,1.0,Indian Super league,2021/2022,India,male,115,115,0,300.4,24.0,2760,True,True,True,True,True
+37,42,3,89,0.0898876404494382,1.0,1.0,1.0,8.0,1.0,FA Women's Super League,2019/2020,England,female,87,87,0,253.8,29.666666666666668,2581,True,True,True,True,True
+43,3,3,77,0.09090909090909091,1.0,1.0,1.0,8.0,1.0,FIFA World Cup,2018,International,male,64,64,0,192.4,25.666666666666668,1643,True,True,True,True,True
+72,107,3,68,0.11764705882352941,1.0,1.0,1.0,9.0,1.0,Women's World Cup,2023,International,female,64,64,64,197.5,22.666666666666668,1451,True,True,True,False,False
+1267,107,3,81,0.06172839506172839,1.0,1.0,1.0,9.0,1.0,African Cup of Nations,2023,Africa,male,52,52,1,139.7,27.0,1404,True,True,True,False,False
+72,30,3,81,0.20987654320987653,1.0,1.0,1.0,9.0,1.0,Women's World Cup,2019,International,female,52,52,0,153.2,27.0,1404,True,True,True,False,False
+55,282,3,78,0.0641025641025641,1.0,1.0,1.0,10.0,1.0,UEFA Euro,2024,Europe,male,51,51,51,160.1,26.0,1326,True,True,True,False,False
+43,106,3,60,0.1,1.0,1.0,1.0,9.0,1.0,FIFA World Cup,2022,International,male,64,64,64,199.6,20.0,1280,True,True,True,False,False
+55,43,3,74,0.08108108108108109,1.0,1.0,1.0,9.0,1.0,UEFA Euro,2020,Europe,male,51,51,51,163.3,24.666666666666668,1258,True,True,True,False,False
+11,26,3,87,0.12643678160919541,1.0,1.0,1.0,8.0,1.0,La Liga,2014/2015,Spain,male,38,38,0,122.8,29.0,1102,True,True,False,False,False
+9,281,3,97,0.09278350515463918,1.0,1.0,1.0,10.0,1.0,1. Bundesliga,2023/2024,Germany,male,34,34,34,119.2,32.333333333333336,1099,True,True,False,False,False
+53,106,3,94,0.06382978723404255,1.0,1.0,1.0,9.0,1.0,UEFA Women's Euro,2022,Europe,female,31,31,31,91.7,31.333333333333332,971,True,True,False,False,False
+2,44,3,76,0.07894736842105263,1.0,1.0,0.9868421052631579,8.0,1.0,Premier League,2003/2004,England,male,38,38,0,110.0,25.333333333333332,963,True,True,False,False,False
+11,1,3,80,0.1125,1.0,1.0,1.0,9.0,1.0,La Liga,2017/2018,Spain,male,36,36,0,117.3,26.666666666666668,960,True,True,False,False,False
+11,2,3,81,0.19753086419753085,1.0,1.0,1.0,8.0,1.0,La Liga,2016/2017,Spain,male,34,34,0,107.4,27.0,918,True,True,False,False,False
+49,3,3,76,0.11842105263157894,1.0,1.0,0.9605263157894737,9.0,1.0,NWSL,2018,United States of America,female,36,36,0,99.0,25.333333333333332,912,True,True,False,False,False
+7,235,3,84,0.20238095238095238,1.0,1.0,1.0,8.5,1.0,Ligue 1,2022/2023,France,male,32,32,32,112.0,28.0,896,True,True,False,False,False
+11,23,3,72,0.16666666666666666,1.0,1.0,1.0,8.0,1.0,La Liga,2011/2012,Spain,male,37,37,0,125.3,24.0,888,True,True,False,False,False
+11,21,3,76,0.14473684210526316,1.0,1.0,1.0,9.0,1.0,La Liga,2009/2010,Spain,male,35,35,0,110.5,25.333333333333332,887,True,True,False,False,False
+11,25,3,81,0.13580246913580246,1.0,1.0,1.0,9.0,1.0,La Liga,2013/2014,Spain,male,31,31,0,101.5,27.0,837,True,True,False,False,False
+11,39,3,92,0.13043478260869565,1.0,1.0,1.0,7.0,1.0,La Liga,2006/2007,Spain,male,26,26,0,79.6,30.666666666666668,797,True,True,False,False,False
+11,4,3,70,0.14285714285714285,1.0,1.0,1.0,9.0,1.0,La Liga,2018/2019,Spain,male,34,34,0,113.2,23.333333333333332,793,True,True,False,False,False
+9,27,3,67,0.07462686567164178,1.0,1.0,1.0,9.0,1.0,1. Bundesliga,2015/2016,Germany,male,34,34,0,100.0,22.333333333333332,759,True,True,False,False,False
+11,22,3,67,0.1044776119402985,1.0,1.0,1.0,8.0,1.0,La Liga,2010/2011,Spain,male,33,33,0,112.0,22.333333333333332,737,True,True,False,False,False
+53,315,3,70,0.11428571428571428,1.0,1.0,1.0,9.0,1.0,UEFA Women's Euro,2025,Europe,female,31,31,31,92.0,23.333333333333332,723,True,True,False,False,False
+11,90,3,61,0.09836065573770492,1.0,1.0,1.0,9.0,1.0,La Liga,2020/2021,Spain,male,35,35,35,119.3,20.333333333333332,712,True,True,False,False,False
+11,41,3,67,0.1044776119402985,1.0,1.0,1.0,8.0,1.0,La Liga,2008/2009,Spain,male,31,31,0,92.2,22.333333333333332,692,True,True,False,False,False
+223,282,3,62,0.04838709677419355,1.0,1.0,1.0,9.0,1.0,Copa America,2024,South America,male,32,32,0,86.8,20.666666666666668,661,True,True,False,False,False
+11,42,3,59,0.1864406779661017,1.0,1.0,1.0,9.0,1.0,La Liga,2019/2020,Spain,male,33,33,0,110.7,19.666666666666668,649,True,True,False,False,False
+11,40,3,72,0.1388888888888889,1.0,1.0,1.0,7.5,1.0,La Liga,2007/2008,Spain,male,27,27,0,83.2,24.0,648,True,True,False,False,False
+11,24,3,60,0.25,1.0,1.0,1.0,8.0,1.0,La Liga,2012/2013,Spain,male,32,32,0,111.7,20.0,640,True,True,False,False,False
+7,108,3,62,0.11290322580645161,1.0,1.0,1.0,8.5,1.0,Ligue 1,2021/2022,France,male,26,26,26,88.0,20.666666666666668,537,True,True,False,False,False
+11,38,3,71,0.11267605633802817,1.0,1.0,1.0,7.0,1.0,La Liga,2005/2006,Spain,male,17,17,0,49.6,23.666666666666668,402,True,True,False,False,False
+43,272,3,151,0.09933774834437085,1.0,1.0,1.0,7.0,1.0,FIFA World Cup,1970,International,male,6,6,0,17.3,50.333333333333336,302,True,True,False,False,False
+43,51,3,105,0.02857142857142857,1.0,1.0,1.0,8.0,1.0,FIFA World Cup,1974,International,male,6,6,0,16.4,35.0,210,True,True,False,False,False
+44,107,3,72,0.1111111111111111,1.0,1.0,1.0,9.0,1.0,Major League Soccer,2023,United States of America,male,6,6,6,18.8,24.0,144,True,True,False,False,False
+11,37,3,61,0.13114754098360656,1.0,1.0,1.0,8.0,1.0,La Liga,2004/2005,Spain,male,7,7,0,19.0,20.333333333333332,142,True,True,False,False,False
+43,269,2,88,0.1590909090909091,1.0,1.0,1.0,5.0,1.0,FIFA World Cup,1958,International,male,2,2,0,6.2,44.0,88,True,True,False,False,False
+43,54,3,88,0.11363636363636363,1.0,1.0,1.0,8.0,1.0,FIFA World Cup,1986,International,male,3,3,0,7.3,29.333333333333332,88,True,True,False,False,False
+35,75,3,87,0.06896551724137931,1.0,1.0,1.0,9.0,1.0,UEFA Europa League,1988/1989,Europe,male,3,3,0,8.7,29.0,87,True,True,False,False,False
+116,68,1,50,0.06,1.0,1.0,0.98,7.0,1.0,North American League,1977,North and Central America,male,1,1,0,2.8,50.0,50,True,True,False,False,False
+16,23,1,48,0.041666666666666664,1.0,1.0,1.0,9.0,1.0,Champions League,2011/2012,Europe,male,1,1,0,4.0,48.0,48,True,True,False,False,False
+16,27,1,43,0.046511627906976744,1.0,1.0,1.0,9.0,1.0,Champions League,2015/2016,Europe,male,1,1,0,4.1,43.0,43,True,True,False,False,False
+43,270,1,43,0.046511627906976744,1.0,1.0,1.0,6.0,1.0,FIFA World Cup,1962,International,male,1,1,0,3.2,43.0,43,True,True,False,False,False
+16,277,1,42,0.023809523809523808,1.0,1.0,1.0,6.5,1.0,Champions League,1972/1973,Europe,male,1,1,0,2.7,42.0,42,True,True,False,False,False
+16,37,1,40,0.15,1.0,1.0,1.0,9.0,1.0,Champions League,2004/2005,Europe,male,1,1,0,4.0,40.0,40,True,True,False,False,False
+16,71,1,35,0.05714285714285714,1.0,1.0,1.0,8.0,1.0,Champions League,1971/1972,Europe,male,1,1,0,2.6,35.0,35,True,True,False,False,False
+12,86,1,35,0.11428571428571428,1.0,1.0,1.0,8.0,1.0,Serie A,1986/1987,Italy,male,1,1,0,2.6,35.0,35,True,True,False,False,False
+16,276,1,34,0.058823529411764705,1.0,1.0,1.0,6.5,1.0,Champions League,1970/1971,Europe,male,1,1,0,3.0,34.0,34,True,True,False,False,False
+16,21,1,34,0.058823529411764705,1.0,1.0,1.0,9.0,1.0,Champions League,2009/2010,Europe,male,1,1,0,3.0,34.0,34,True,True,False,False,False
+16,26,1,32,0.125,1.0,1.0,1.0,8.0,1.0,Champions League,2014/2015,Europe,male,1,1,0,2.9,32.0,32,True,True,False,False,False
+81,48,1,32,0.09375,1.0,1.0,1.0,7.0,1.0,Liga Profesional,1997/1998,Argentina,male,1,1,0,3.1,32.0,32,True,True,False,False,False
+16,25,1,31,0.12903225806451613,1.0,1.0,1.0,10.0,1.0,Champions League,2013/2014,Europe,male,1,1,0,3.7,31.0,31,True,True,False,False,False
+16,24,1,29,0.06896551724137931,1.0,1.0,1.0,8.0,1.0,Champions League,2012/2013,Europe,male,1,1,0,2.9,29.0,29,True,True,False,False,False
+16,4,1,29,0.034482758620689655,1.0,1.0,0.9655172413793104,10.0,1.0,Champions League,2018/2019,Europe,male,1,1,0,2.8,29.0,29,True,True,False,False,False
+1470,274,1,29,0.10344827586206896,1.0,1.0,1.0,8.0,1.0,FIFA U20 World Cup,1979,International,male,1,1,0,2.8,29.0,29,True,True,False,False,False
+16,1,1,28,0.14285714285714285,1.0,1.0,1.0,9.0,1.0,Champions League,2017/2018,Europe,male,1,1,0,3.0,28.0,28,True,True,False,False,False
+11,278,1,28,0.17857142857142858,1.0,1.0,0.9642857142857143,5.5,1.0,La Liga,1973/1974,Spain,male,1,1,0,2.6,28.0,28,True,True,False,False,False
+16,76,1,27,0.07407407407407407,1.0,1.0,1.0,8.0,1.0,Champions League,1999/2000,Europe,male,1,1,0,2.9,27.0,27,True,True,False,False,False
+16,2,1,27,0.18518518518518517,1.0,1.0,1.0,9.0,1.0,Champions League,2016/2017,Europe,male,1,1,0,2.9,27.0,27,True,True,False,False,False
+16,22,1,26,0.15384615384615385,1.0,1.0,1.0,8.0,1.0,Champions League,2010/2011,Europe,male,1,1,0,3.7,26.0,26,True,True,False,False,False
+87,279,1,26,0.11538461538461539,1.0,1.0,1.0,7.5,1.0,Copa del Rey,1977/1978,Spain,male,1,1,0,2.5,26.0,26,True,True,False,False,False
+87,268,1,25,0.12,1.0,1.0,1.0,8.0,1.0,Copa del Rey,1982/1983,Spain,male,1,1,0,2.2,25.0,25,True,True,False,False,False
+81,275,1,24,0.125,1.0,1.0,1.0,10.0,1.0,Liga Profesional,1981,Argentina,male,1,1,0,2.7,24.0,24,True,True,False,False,False
+16,41,1,23,0.08695652173913043,1.0,1.0,1.0,9.0,1.0,Champions League,2008/2009,Europe,male,1,1,0,2.9,23.0,23,True,True,False,False,False
+43,55,1,23,0.043478260869565216,1.0,1.0,1.0,7.0,1.0,FIFA World Cup,1990,International,male,1,1,0,2.7,23.0,23,True,True,False,False,False
+87,84,1,22,0.045454545454545456,1.0,1.0,1.0,8.0,1.0,Copa del Rey,1983/1984,Spain,male,1,1,0,2.2,22.0,22,True,True,False,False,False
+16,39,1,20,0.15,1.0,1.0,1.0,9.0,1.0,Champions League,2006/2007,Europe,male,1,1,0,2.6,20.0,20,True,True,False,False,False
+16,44,1,13,0.23076923076923078,1.0,1.0,1.0,8.0,1.0,Champions League,2003/2004,Europe,male,1,1,0,2.7,13.0,13,True,True,False,False,False

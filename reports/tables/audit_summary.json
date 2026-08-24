@@ -1,0 +1,253 @@
+{
+  "generated_at": "2026-08-23T15:32:07+00:00",
+  "commit_sha": "b0bc9f22dd77c206ddedc1d742893b3bbe64baec",
+  "matches_per_season": 3,
+  "n_matches_audited": 181,
+  "audit_download_mb": 553.6,
+  "source_totals": {
+    "n_event_files": 4235,
+    "events_gb": 12.82,
+    "n_360_files": 426,
+    "three_sixty_gb": 3.21,
+    "n_match_files": 80,
+    "matches_mb": 7.2
+  },
+  "shot_summary": {
+    "n_shots_total": 4996,
+    "n_shots_penalty": 91,
+    "n_shots_unknown_outcome": 0,
+    "n_shots_missing_location": 0,
+    "n_shots_eligible": 4905,
+    "n_shots_with_freeze_frame": 4905,
+    "share_with_freeze_frame": 1.0,
+    "n_shots_with_context": 4905,
+    "share_with_context": 1.0,
+    "n_shots_with_gk": 4898,
+    "share_with_gk": 0.9985728848114169,
+    "share_gk_given_freeze_frame": 0.9985728848114169,
+    "median_opponents_in_frame": 8.0,
+    "mean_opponents_in_frame": 8.250152905198776,
+    "n_frames_with_invalid_locations": 0,
+    "share_with_statsbomb_xg": 1.0,
+    "goal_rate_all_eligible": 0.11049949031600408,
+    "goal_rate_with_context": 0.11049949031600408,
+    "goal_rate_without_context": NaN
+  },
+  "criteria": {
+    "min_context_share": 0.95,
+    "min_gk_share": 0.9,
+    "min_estimated_shots": 1500,
+    "min_matches": 50,
+    "max_download_gb": 5.0,
+    "target_shots": 15000
+  },
+  "recommended_selection": [
+    {
+      "competition_id": 11,
+      "season_id": 27,
+      "competition_name": "La Liga",
+      "season_name": "2015/2016",
+      "n_matches_with_events": 380,
+      "estimated_total_shots": 9373
+    },
+    {
+      "competition_id": 2,
+      "season_id": 27,
+      "competition_name": "Premier League",
+      "season_name": "2015/2016",
+      "n_matches_with_events": 380,
+      "estimated_total_shots": 9120
+    },
+    {
+      "competition_id": 12,
+      "season_id": 27,
+      "competition_name": "Serie A",
+      "season_name": "2015/2016",
+      "n_matches_with_events": 380,
+      "estimated_total_shots": 8993
+    },
+    {
+      "competition_id": 7,
+      "season_id": 27,
+      "competition_name": "Ligue 1",
+      "season_name": "2015/2016",
+      "n_matches_with_events": 377,
+      "estimated_total_shots": 8168
+    }
+  ],
+  "recommended_download": {
+    "n_matches": 1517,
+    "n_files": 1517,
+    "total_bytes": 4568675058,
+    "total_mb": 4568.7,
+    "total_gb": 4.569
+  },
+  "candidate_blocks": [
+    {
+      "gender": "male",
+      "season_name": "2015/2016",
+      "n_competitions": 4,
+      "n_matches": 1517,
+      "estimated_total_shots": 35654,
+      "events_mb": 4568.7,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "La Liga, Ligue 1, Premier League, Serie A",
+      "events_gb": 4.5687,
+      "fits_budget": true,
+      "meets_target": true
+    },
+    {
+      "gender": "female",
+      "season_name": "2023/2024",
+      "n_competitions": 4,
+      "n_matches": 634,
+      "estimated_total_shots": 19299,
+      "events_mb": 1935.4,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "FA Women's Super League, Frauen Bundesliga, Liga F, Serie A Women",
+      "events_gb": 1.9354,
+      "fits_budget": true,
+      "meets_target": true
+    },
+    {
+      "gender": "female",
+      "season_name": "2020/2021",
+      "n_competitions": 1,
+      "n_matches": 131,
+      "estimated_total_shots": 3493,
+      "events_mb": 383.6,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "FA Women's Super League",
+      "events_gb": 0.3836,
+      "fits_budget": true,
+      "meets_target": false
+    },
+    {
+      "gender": "female",
+      "season_name": "2023",
+      "n_competitions": 1,
+      "n_matches": 137,
+      "estimated_total_shots": 3471,
+      "events_mb": 402.1,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "NWSL",
+      "events_gb": 0.4021,
+      "fits_budget": true,
+      "meets_target": false
+    },
+    {
+      "gender": "female",
+      "season_name": "2018/2019",
+      "n_competitions": 1,
+      "n_matches": 107,
+      "estimated_total_shots": 3210,
+      "events_mb": 308.0,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "FA Women's Super League",
+      "events_gb": 0.308,
+      "fits_budget": true,
+      "meets_target": false
+    },
+    {
+      "gender": "male",
+      "season_name": "2021/2022",
+      "n_competitions": 1,
+      "n_matches": 115,
+      "estimated_total_shots": 2760,
+      "events_mb": 300.4,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "Indian Super league",
+      "events_gb": 0.3004,
+      "fits_budget": true,
+      "meets_target": false
+    },
+    {
+      "gender": "female",
+      "season_name": "2019/2020",
+      "n_competitions": 1,
+      "n_matches": 87,
+      "estimated_total_shots": 2581,
+      "events_mb": 253.8,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "FA Women's Super League",
+      "events_gb": 0.2538,
+      "fits_budget": true,
+      "meets_target": false
+    },
+    {
+      "gender": "male",
+      "season_name": "2018",
+      "n_competitions": 1,
+      "n_matches": 64,
+      "estimated_total_shots": 1643,
+      "events_mb": 192.4,
+      "min_context_share": 1.0,
+      "min_gk_share": 1.0,
+      "n_matches_with_360": 0,
+      "competitions": "FIFA World Cup",
+      "events_gb": 0.19240000000000002,
+      "fits_budget": true,
+      "meets_target": false
+    }
+  ],
+  "three_sixty_probe": [
+    {
+      "match_id": 3802676,
+      "n_360_frames_total": 3255,
+      "n_shots": 26,
+      "n_shots_with_shot_freeze_frame": 26,
+      "n_shots_covered_by_360": 26,
+      "n_shots_with_visible_area": 26,
+      "mean_players_shot_freeze_frame": 12.615384615384615,
+      "mean_players_360_frame": 13.461538461538462,
+      "frame_keys": [
+        "event_uuid",
+        "freeze_frame",
+        "visible_area"
+      ],
+      "player_keys": [
+        "actor",
+        "keeper",
+        "location",
+        "teammate"
+      ],
+      "file_mb": 8.3
+    },
+    {
+      "match_id": 3802839,
+      "n_360_frames_total": 3244,
+      "n_shots": 29,
+      "n_shots_with_shot_freeze_frame": 27,
+      "n_shots_covered_by_360": 29,
+      "n_shots_with_visible_area": 29,
+      "mean_players_shot_freeze_frame": 12.11111111111111,
+      "mean_players_360_frame": 12.931034482758621,
+      "frame_keys": [
+        "event_uuid",
+        "freeze_frame",
+        "visible_area"
+      ],
+      "player_keys": [
+        "actor",
+        "keeper",
+        "location",
+        "teammate"
+      ],
+      "file_mb": 8.4
+    }
+  ]
+}

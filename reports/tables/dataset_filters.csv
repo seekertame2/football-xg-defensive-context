@@ -1,0 +1,8 @@
+step,description,n_before,n_after,n_dropped,share_dropped
+all_shots,Все события типа Shot,37888,37888,0,0.0
+drop_penalties,"Пенальти и удары серии пенальти",37888,37488,400,0.010557
+drop_unknown_outcome,Исход удара вне известной схемы StatsBomb,37488,37488,0,0.0
+drop_missing_location,Нет координат удара,37488,37488,0,0.0
+drop_missing_shot_id,Нет идентификатора события,37488,37488,0,0.0
+drop_duplicate_shot_id,Дубликаты shot_id,37488,37488,0,0.0
+context_eligible,Есть freeze_frame и хотя бы один соперник с координатами,37488,37487,1,2.7e-05

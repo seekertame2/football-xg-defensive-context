@@ -1,0 +1,182 @@
+{
+  "n_matches": 1517,
+  "n_events_total": 5321459,
+  "n_shot_events": 37888,
+  "n_all_eligible": 37488,
+  "n_context_eligible": 37487,
+  "share_context_of_all": 0.9999733247972684,
+  "share_with_freeze_frame": 1.0,
+  "share_with_opponent_coordinates": 0.9999733247972684,
+  "share_with_goalkeeper": 0.9991463935125907,
+  "share_with_statsbomb_xg": 1.0,
+  "goal_rate_all_eligible": 0.09520379854886897,
+  "goal_rate_context_eligible": 0.09517966228292475,
+  "mean_opponents_visible": 7.50034677763551,
+  "median_opponents_visible": 8.0,
+  "n_frames_with_invalid_locations": 0,
+  "by_league": [
+    {
+      "competition_name": "Serie A",
+      "n_matches": 380,
+      "n_shots": 9877,
+      "goal_rate": 0.0868684823326921,
+      "share_with_freeze_frame": 1.0,
+      "share_with_opponents": 1.0,
+      "share_with_goalkeeper": 0.9997975093651918,
+      "share_with_statsbomb_xg": 1.0,
+      "mean_opponents_visible": 7.436468563328946,
+      "median_opponents_visible": 8.0
+    },
+    {
+      "competition_name": "Premier League",
+      "n_matches": 380,
+      "n_shots": 9817,
+      "goal_rate": 0.09310379953142509,
+      "share_with_freeze_frame": 1.0,
+      "share_with_opponents": 1.0,
+      "share_with_goalkeeper": 0.9986757665274524,
+      "share_with_statsbomb_xg": 1.0,
+      "mean_opponents_visible": 7.560558215340736,
+      "median_opponents_visible": 8.0
+    },
+    {
+      "competition_name": "La Liga",
+      "n_matches": 380,
+      "n_shots": 9071,
+      "goal_rate": 0.10417815014882593,
+      "share_with_freeze_frame": 1.0,
+      "share_with_opponents": 0.999889758571271,
+      "share_with_goalkeeper": 0.998787344283982,
+      "share_with_statsbomb_xg": 1.0,
+      "mean_opponents_visible": 7.520339543600485,
+      "median_opponents_visible": 8.0
+    },
+    {
+      "competition_name": "Ligue 1",
+      "n_matches": 377,
+      "n_shots": 8723,
+      "goal_rate": 0.09767281898429439,
+      "share_with_freeze_frame": 1.0,
+      "share_with_opponents": 1.0,
+      "share_with_goalkeeper": 0.9993121632465894,
+      "share_with_statsbomb_xg": 1.0,
+      "mean_opponents_visible": 7.484122434942107,
+      "median_opponents_visible": 8.0
+    }
+  ],
+  "schema": {
+    "n_matches": 1517,
+    "n_events_total": 5321459,
+    "outcome_counts": {
+      "Off T": 12637,
+      "Blocked": 9472,
+      "Goal": 3869,
+      "Saved": 8783,
+      "Wayward": 2154,
+      "Post": 710,
+      "Saved Off Target": 145,
+      "Saved to Post": 118
+    },
+    "unknown_outcomes": {},
+    "shot_type_counts": {
+      "Open Play": 35732,
+      "Penalty": 400,
+      "Free Kick": 1749,
+      "Corner": 7
+    },
+    "boolean_values": {
+      "under_pressure": {
+        "True": 9809
+      },
+      "first_time": {
+        "True": 11862
+      },
+      "aerial_won": {
+        "True": 3357
+      },
+      "one_on_one": {
+        "True": 1903
+      },
+      "deflected": {
+        "True": 517
+      },
+      "open_goal": {
+        "True": 388
+      },
+      "redirect": {
+        "True": 79
+      },
+      "follows_dribble": {
+        "True": 32
+      }
+    },
+    "sparse_booleans_confirmed": {
+      "aerial_won": true,
+      "deflected": true,
+      "first_time": true,
+      "follows_dribble": true,
+      "one_on_one": true,
+      "open_goal": true,
+      "redirect": true,
+      "under_pressure": true
+    }
+  },
+  "filter_log": [
+    {
+      "step": "all_shots",
+      "description": "Все события типа Shot",
+      "n_before": 37888,
+      "n_after": 37888,
+      "n_dropped": 0,
+      "share_dropped": 0.0
+    },
+    {
+      "step": "drop_penalties",
+      "description": "Пенальти и удары серии пенальти",
+      "n_before": 37888,
+      "n_after": 37488,
+      "n_dropped": 400,
+      "share_dropped": 0.010557
+    },
+    {
+      "step": "drop_unknown_outcome",
+      "description": "Исход удара вне известной схемы StatsBomb",
+      "n_before": 37488,
+      "n_after": 37488,
+      "n_dropped": 0,
+      "share_dropped": 0.0
+    },
+    {
+      "step": "drop_missing_location",
+      "description": "Нет координат удара",
+      "n_before": 37488,
+      "n_after": 37488,
+      "n_dropped": 0,
+      "share_dropped": 0.0
+    },
+    {
+      "step": "drop_missing_shot_id",
+      "description": "Нет идентификатора события",
+      "n_before": 37488,
+      "n_after": 37488,
+      "n_dropped": 0,
+      "share_dropped": 0.0
+    },
+    {
+      "step": "drop_duplicate_shot_id",
+      "description": "Дубликаты shot_id",
+      "n_before": 37488,
+      "n_after": 37488,
+      "n_dropped": 0,
+      "share_dropped": 0.0
+    },
+    {
+      "step": "context_eligible",
+      "description": "Есть freeze_frame и хотя бы один соперник с координатами",
+      "n_before": 37488,
+      "n_after": 37487,
+      "n_dropped": 1,
+      "share_dropped": 2.7e-05
+    }
+  ]
+}
